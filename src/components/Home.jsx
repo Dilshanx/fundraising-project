@@ -15,7 +15,7 @@ import {
   MoonIcon,
 } from "lucide-react";
 import Navbar from "./Navbar";
-import Footer from "@/Footer";
+import Footer from "@/components/Footer";
 
 // Theme Management Hook
 // This custom hook handles theme state, system preferences, and localStorage persistence
