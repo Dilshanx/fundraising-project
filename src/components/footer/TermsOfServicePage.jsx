@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
 const TermsOfService = () => {
   return (
     <motion.div
@@ -16,18 +17,20 @@ const TermsOfService = () => {
         </h1>
         <div className='prose dark:prose-invert'>
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
               1. Acceptance of Terms
             </h2>
-            <p>
+            <p className='text-gray-700 dark:text-gray-300'>
               By accessing or using our platform, you agree to these terms. If
               you do not agree, do not use our services.
             </p>
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>2. User Accounts</h2>
-            <ul>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
+              2. User Accounts
+            </h2>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>Users must provide accurate and complete information</li>
               <li>One account per individual is permitted</li>
               <li>
@@ -38,11 +41,11 @@ const TermsOfService = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
               3. Campaign Guidelines
             </h2>
-            <p>Campaigns must:</p>
-            <ul>
+            <p className='text-gray-700 dark:text-gray-300'>Campaigns must:</p>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>Be legal and ethical</li>
               <li>Not promote hate, violence, or discrimination</li>
               <li>Provide accurate and truthful information</li>
@@ -51,10 +54,10 @@ const TermsOfService = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
               4. Financial Transactions
             </h2>
-            <ul>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>All donations are final and non-refundable</li>
               <li>Platform takes a small percentage as service fee</li>
               <li>Funds are transferred to campaign creators periodically</li>
@@ -63,9 +66,11 @@ const TermsOfService = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>5. User Conduct</h2>
-            <p>Users shall not:</p>
-            <ul>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
+              5. User Conduct
+            </h2>
+            <p className='text-gray-700 dark:text-gray-300'>Users shall not:</p>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>Use the platform for fraudulent activities</li>
               <li>Harass or intimidate other users</li>
               <li>Upload malicious content</li>
@@ -74,14 +79,14 @@ const TermsOfService = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
               6. Limitation of Liability
             </h2>
-            <p>
+            <p className='text-gray-700 dark:text-gray-300'>
               Our platform is provided "as is" without warranties. We are not
               liable for:
             </p>
-            <ul>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>Campaign outcomes</li>
               <li>User interactions</li>
               <li>External links or resources</li>
@@ -90,9 +95,13 @@ const TermsOfService = () => {
           </section>
 
           <section className='mb-8'>
-            <h2 className='text-2xl font-semibold mb-4'>7. Termination</h2>
-            <p>We reserve the right to:</p>
-            <ul>
+            <h2 className='text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100'>
+              7. Termination
+            </h2>
+            <p className='text-gray-700 dark:text-gray-300'>
+              We reserve the right to:
+            </p>
+            <ul className='list-disc list-outside pl-5 text-gray-700 dark:text-gray-300'>
               <li>Suspend or terminate accounts</li>
               <li>Remove campaigns</li>
               <li>Modify or discontinue services</li>
@@ -101,10 +110,10 @@ const TermsOfService = () => {
           </section>
 
           <section className='mt-12'>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>
+            <p className='text-sm text-gray-600 dark:text-gray-300'>
               Last Updated: December 2024
             </p>
-            <p className='text-sm text-gray-600 dark:text-gray-400'>
+            <p className='text-sm text-gray-600 dark:text-gray-300'>
               Contact our Legal Team at legal@fundraisinghub.com
             </p>
           </section>
@@ -114,4 +123,5 @@ const TermsOfService = () => {
     </motion.div>
   );
 };
+
 export default TermsOfService;

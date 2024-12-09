@@ -129,6 +129,7 @@ export default function Navbar() {
             variant='ghost'
             size='icon'
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className='text-gray-600 dark:text-gray-300'
           >
             <MenuIcon />
           </Button>
