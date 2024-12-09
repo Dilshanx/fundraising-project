@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Home as HomeIcon,
   Rocket as RocketIcon,
@@ -49,7 +49,7 @@ export default function Navbar() {
       Icon: HomeIcon,
     },
     {
-      href: "/campaigns",
+      href: "/explore-campaigns",
       label: "Campaigns",
       Icon: RocketIcon,
     },
@@ -59,7 +59,7 @@ export default function Navbar() {
       Icon: CreditCardIcon,
     },
     {
-      href: "/support",
+      href: "/help-support",
       label: "Support",
       Icon: MessageCircleIcon,
     },

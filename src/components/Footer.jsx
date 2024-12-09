@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Twitter as TwitterIcon,
   Facebook as FacebookIcon,
@@ -36,27 +35,25 @@ const Footer = () => {
     {
       title: "Quick Links",
       links: [
-        { label: "Home", href: "#" },
-        { label: "Start a Campaign", href: "#" },
-        { label: "Explore Causes", href: "#" },
-        { label: "Help Center", href: "#" },
+        { label: "Home", href: "/home" },
+        { label: "Start a Campaign", href: "/create-campaign" },
+        { label: "Explore Causes", href: "/explore-campaigns" },
       ],
     },
     {
       title: "Support",
       links: [
-        { label: "Contact Us", href: "#" },
-        { label: "FAQ", href: "#" },
+        { label: "Contact Us", href: "/help-support" },
+        { label: "FAQ", href: "/faq" },
         { label: "Live Chat", href: "#" },
-        { label: "Support Ticket", href: "#" },
       ],
     },
     {
       title: "Legal",
       links: [
-        { label: "Privacy Policy", href: "#" },
-        { label: "Terms of Service", href: "#" },
-        { label: "Data Protection", href: "#" },
+        { label: "Privacy Policy", href: "/privacy-policy" },
+        { label: "Terms of Service", href: "/terms-of-service" },
+        { label: "Data Protection", href: "/data-protection" },
       ],
     },
   ];

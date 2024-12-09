@@ -353,14 +353,14 @@ const Register = () => {
                 onValueChange={handleRoleChange}
               >
                 <SelectTrigger
-                  className='w-full border-2 border-indigo-200 hover:border-indigo-400 transition-colors duration-300 
-                 bg-white shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-200 
+                  className='w-full border-2 border-indigo-200 hover:border-indigo-400 transition-colors duration-300
+                 bg-white shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-200
                  text-gray-800 font-medium'
                 >
                   <SelectValue placeholder='Choose your community role' />
                 </SelectTrigger>
                 <SelectContent
-                  className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl 
+                  className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
                  border border-gray-100 ring-1 ring-black ring-opacity-5'
                 >
                   <div className='p-1'>
@@ -391,21 +391,6 @@ const Register = () => {
                       </div>
                       <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
                         Launch and manage campaigns
-                      </span>
-                    </SelectItem>
-
-                    <SelectItem
-                      value='volunteer'
-                      className='flex items-center justify-between hover:bg-orange-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
-                    >
-                      <div className='flex items-center'>
-                        <span className='mr-3 text-orange-600 group-hover:text-orange-800'>
-                          ❤️
-                        </span>
-                        <span>Volunteer</span>
-                      </div>
-                      <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
-                        Make a difference in your community
                       </span>
                     </SelectItem>
                   </div>
@@ -461,3 +446,251 @@ const Register = () => {
 };
 
 export default Register;
+
+// import { useState } from "react";
+// import { apiConfig } from "@/config/apiConfig";
+
+// const Register = () => {
+//   const [formData, setFormData] = useState({
+//     name: "",
+//     email: "",
+//     phone: "",
+//     password: "",
+//     confirmPassword: "",
+//   });
+
+//   const [error, setError] = useState("");
+//   const [success, setSuccess] = useState("");
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData((prevState) => ({
+//       ...prevState,
+//       [name]: value,
+//     }));
+//   };
+
+//   const validateForm = () => {
+//     // Comprehensive form validation
+//     if (formData.password !== formData.confirmPassword) {
+//       setError("Passwords do not match");
+//       return false;
+//     }
+
+//     // Validate email
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(formData.email)) {
+//       setError("Please enter a valid email address");
+//       return false;
+//     }
+
+//     // Validate phone number (basic validation)
+//     const phoneRegex =
+//       /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+//     if (!phoneRegex.test(formData.phone)) {
+//       setError("Please enter a valid phone number");
+//       return false;
+//     }
+
+//     // Password strength validation
+//     const passwordRegex =
+//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+//     if (!passwordRegex.test(formData.password)) {
+//       setError(
+//         "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+//       );
+//       return false;
+//     }
+
+//     // Name validation
+//     if (formData.name.trim() === "") {
+//       setError("Please enter a valid name");
+//       return false;
+//     }
+
+//     return true;
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setError("");
+//     setSuccess("");
+
+//     if (!validateForm()) return;
+
+//     try {
+//       // Prepare data matching UserCreateInput type
+//       const { confirmPassword, ...submissionData } = formData;
+
+//       // Sanitize and prepare data
+//       const sanitizedData = {
+//         ...submissionData,
+//         email: submissionData.email.trim().toLowerCase(),
+//         name: submissionData.name.trim(),
+//         phone: submissionData.phone.trim(),
+//         createdAt: new Date().toISOString(),
+//         deleted: false,
+//       };
+
+//       console.log("Sending registration data:", sanitizedData);
+
+//       const response = await apiConfig.post("/auth/users", sanitizedData, {
+//         validateStatus: (status) => {
+//           // Treat a wider range of status codes as successful
+//           return (status >= 200 && status < 300) || status === 422;
+//         },
+//       });
+
+//       if (response.status === 200 || response.status === 201) {
+//         setSuccess("Registration successful!");
+//         // Potential auto-login or redirect logic
+//       } else {
+//         // Handle potential validation errors
+//         const errorDetails = response.data.errors || response.data.message;
+//         setError(errorDetails || "Registration encountered an issue");
+//       }
+//     } catch (err) {
+//       console.error("Comprehensive registration error:", {
+//         errorName: err.name,
+//         errorMessage: err.message,
+//         responseData: err.response?.data,
+//         responseStatus: err.response?.status,
+//       });
+
+//       const errorMessage =
+//         err.response?.data?.message ||
+//         err.response?.data?.error ||
+//         err.response?.data?.errors?.[0] ||
+//         err.message ||
+//         "Registration failed";
+
+//       setError(errorMessage);
+//     }
+//   };
+
+//   return (
+//     <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+//       <div className='max-w-md w-full space-y-8'>
+//         <div>
+//           <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+//             Create Your Account
+//           </h2>
+//         </div>
+//         <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
+//           <div className='rounded-md shadow-sm -space-y-px'>
+//             <div>
+//               <label htmlFor='name' className='sr-only'>
+//                 Full Name
+//               </label>
+//               <input
+//                 id='name'
+//                 name='name'
+//                 type='text'
+//                 required
+//                 className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+//                 placeholder='Full Name'
+//                 value={formData.name}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor='email' className='sr-only'>
+//                 Email address
+//               </label>
+//               <input
+//                 id='email'
+//                 name='email'
+//                 type='email'
+//                 autoComplete='email'
+//                 required
+//                 className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+//                 placeholder='Email address'
+//                 value={formData.email}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor='phone' className='sr-only'>
+//                 Phone Number
+//               </label>
+//               <input
+//                 id='phone'
+//                 name='phone'
+//                 type='tel'
+//                 required
+//                 className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+//                 placeholder='Phone Number'
+//                 value={formData.phone}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor='password' className='sr-only'>
+//                 Password
+//               </label>
+//               <input
+//                 id='password'
+//                 name='password'
+//                 type='password'
+//                 autoComplete='new-password'
+//                 required
+//                 className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+//                 placeholder='Password'
+//                 value={formData.password}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//             <div>
+//               <label htmlFor='confirmPassword' className='sr-only'>
+//                 Confirm Password
+//               </label>
+//               <input
+//                 id='confirmPassword'
+//                 name='confirmPassword'
+//                 type='password'
+//                 required
+//                 className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm'
+//                 placeholder='Confirm Password'
+//                 value={formData.confirmPassword}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//           </div>
+
+//           {/* Error Message */}
+//           {error && (
+//             <div className='text-red-500 text-sm text-center'>{error}</div>
+//           )}
+
+//           {/* Success Message */}
+//           {success && (
+//             <div className='text-green-500 text-sm text-center'>{success}</div>
+//           )}
+
+//           <div>
+//             <button
+//               type='submit'
+//               className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+//             >
+//               Register
+//             </button>
+//           </div>
+//         </form>
+
+//         <div className='text-center'>
+//           <p className='mt-2 text-sm text-gray-600'>
+//             Already have an account?{" "}
+//             <a
+//               href='/login'
+//               className='font-medium text-indigo-600 hover:text-indigo-500'
+//             >
+//               Log in
+//             </a>
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Register;

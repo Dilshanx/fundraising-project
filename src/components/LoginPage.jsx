@@ -30,6 +30,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+import { apiConfig } from "@/config/apiConfig";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -63,25 +64,31 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
+      const response = await apiConfig.post("/auth/login", loginData);
 
-      if (response.ok) {
-        // Redirect or handle successful login
-        window.location.href = "/dashboard";
-      } else {
-        // Handle login error
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
-      }
+      // Assuming the backend returns a token or user data
+      const { data } = response;
+
+      // Store token in localStorage or context if needed
+      localStorage.setItem("userToken", data.token);
+
+      // Redirect to dashboard
+      window.location.href = "/";
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred during login");
+
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(error.response.data.message || "Login failed");
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError("An error occurred during login");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +96,7 @@ const LoginPage = () => {
 
   const handleSocialLogin = (provider) => {
     // Redirect to backend social login route
-    window.location.href = `/api/auth/${provider}`;
+    window.location.href = `${apiConfig.defaults.baseURL}/auth/${provider}`;
   };
 
   return (
