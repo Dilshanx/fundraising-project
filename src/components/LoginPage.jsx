@@ -232,7 +232,7 @@ const LoginPage = () => {
           </div>
 
           <div className='text-center text-sm text-gray-600 mt-6'>
-            Don't have an account?{" "}
+            Don't have an account?
             <Button
               variant='link'
               size='sm'

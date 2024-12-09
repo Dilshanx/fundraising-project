@@ -81,8 +81,8 @@ const PasswordStrengthMeter = ({ password }) => {
 
 const Register = () => {
   const [registerData, setRegisterData] = useState({
-    username: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     role: "donor",
@@ -90,8 +90,8 @@ const Register = () => {
   });
 
   const [validationErrors, setValidationErrors] = useState({
-    username: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     termsAccepted: "",
@@ -101,24 +101,24 @@ const Register = () => {
 
   const validateForm = () => {
     const errors = {
-      username: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       termsAccepted: "",
     };
 
-    // Username validation
-    if (registerData.username.length < 3) {
-      errors.username = "Username must be at least 3 characters long";
-    } else if (registerData.username.length > 20) {
-      errors.username = "Username cannot exceed 20 characters";
-    }
-
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(registerData.email)) {
       errors.email = "Please enter a valid email address";
+    }
+
+    // Phone number validation (supports various international formats)
+    const phoneRegex =
+      /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    if (!phoneRegex.test(registerData.phone)) {
+      errors.phone = "Please enter a valid phone number";
     }
 
     // Password validation
@@ -204,58 +204,6 @@ const Register = () => {
         </CardHeader>
         <CardContent className='bg-white p-6 space-y-4'>
           <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Username Input */}
-            <div>
-              <Label
-                htmlFor='username'
-                className='flex items-center justify-between'
-              >
-                <span>Username</span>
-                {registerData.username && !validationErrors.username && (
-                  <CheckCircle2 className='text-green-500' size={16} />
-                )}
-              </Label>
-              <div className='relative'>
-                <Input
-                  type='text'
-                  name='username'
-                  value={registerData.username}
-                  onChange={handleChange}
-                  placeholder='Choose a unique username'
-                  className={`${
-                    validationErrors.username
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } pr-10`}
-                />
-                {registerData.username.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className='absolute right-3 top-1/2 transform -translate-y-1/2'
-                  >
-                    {validationErrors.username ? (
-                      <AlertCircle className='text-red-500' size={20} />
-                    ) : (
-                      <CheckCircle2 className='text-green-500' size={20} />
-                    )}
-                  </motion.div>
-                )}
-              </div>
-              <AnimatePresence>
-                {validationErrors.username && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className='text-red-500 text-sm mt-1'
-                  >
-                    {validationErrors.username}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </div>
-
             {/* Email Input */}
             <div>
               <Label htmlFor='email' className='flex items-center'>
@@ -276,6 +224,30 @@ const Register = () => {
                 <p className='text-red-500 text-sm mt-1 flex items-center'>
                   <AlertCircle className='mr-2' size={16} />
                   {validationErrors.email}
+                </p>
+              )}
+            </div>
+
+            {/* Phone Number Input */}
+            <div>
+              <Label htmlFor='phone' className='flex items-center'>
+                Phone Number
+                {registerData.phone && !validationErrors.phone && (
+                  <CheckCircle2 className='ml-2 text-green-500' size={16} />
+                )}
+              </Label>
+              <Input
+                type='tel'
+                name='phone'
+                value={registerData.phone}
+                onChange={handleChange}
+                placeholder='Enter your phone number'
+                className={`${validationErrors.phone ? "border-red-500" : ""}`}
+              />
+              {validationErrors.phone && (
+                <p className='text-red-500 text-sm mt-1 flex items-center'>
+                  <AlertCircle className='mr-2' size={16} />
+                  {validationErrors.phone}
                 </p>
               )}
             </div>
@@ -433,7 +405,7 @@ const Register = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 type='submit'
-                className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-md shadow-lg transition-all'
+                className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 ease-in-out'
               >
                 Create Account
               </Button>
