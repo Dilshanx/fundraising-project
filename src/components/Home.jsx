@@ -243,7 +243,7 @@ const Home = () => {
 
       <Navbar />
 
-      <div className='pt-24'>
+      <div className='pt-14'>
         {/* Hero Section */}
         <div className='container mx-auto px-5 py-16 text-center'>
           <h1 className='text-5xl font-bold mb-4 py-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>

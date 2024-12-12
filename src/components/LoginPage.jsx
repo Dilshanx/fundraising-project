@@ -30,7 +30,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import { apiConfig } from "@/config/apiConfig";
+import apiConfig from "@/config/apiConfig";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -64,13 +64,19 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await apiConfig.post("/auth/login", loginData);
+      const response = await apiConfig.post(
+        "/auth/login",
+        {
+          email: loginData.email,
+          password: loginData.password,
+        },
+        {
+          // Important: Include credentials to allow cookies to be set
+          withCredentials: true,
+        }
+      );
 
-      // Assuming the backend returns a token or user data
-      const { data } = response;
-
-      // Store token in localStorage or context if needed
-      localStorage.setItem("userToken", data.token);
+      console.log("Login response:", response.data);
 
       // Redirect to dashboard
       window.location.href = "/";
@@ -81,7 +87,7 @@ const LoginPage = () => {
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
-        setError(error.response.data.message || "Login failed");
+        setError(error.response.data.error || "Login failed");
       } else if (error.request) {
         // The request was made but no response was received
         setError("No response from server. Please check your connection.");
@@ -95,8 +101,9 @@ const LoginPage = () => {
   };
 
   const handleSocialLogin = (provider) => {
-    // Redirect to backend social login route
-    window.location.href = `${apiConfig.defaults.baseURL}/auth/${provider}`;
+    // Redirect to backend social login endpoint
+    // This assumes your backend has corresponding social login routes
+    window.location.href = `${apiConfig.baseURL}/auth/${provider}`;
   };
 
   return (

@@ -50,7 +50,6 @@ const HelpSupportPage = () => {
 
   const submitSupportTicket = (e) => {
     e.preventDefault();
-    // Implement ticket submission logic
     console.log("Ticket submitted:", {
       subject: ticketSubject,
       description: ticketDescription,
@@ -64,14 +63,21 @@ const HelpSupportPage = () => {
           <div className='space-y-6'>
             {faqCategories.map((category, index) => (
               <div key={index}>
-                <h3 className='text-xl font-semibold mb-4'>{category.title}</h3>
+                <h3 className='text-xl font-semibold mb-4 dark:text-gray-100'>
+                  {category.title}
+                </h3>
                 {category.questions.map((faq, qIndex) => (
-                  <Card key={qIndex} className='mb-4'>
+                  <Card
+                    key={qIndex}
+                    className='mb-4 bg-gray-50 dark:bg-gray-700'
+                  >
                     <CardHeader>
-                      <CardTitle>{faq.question}</CardTitle>
+                      <CardTitle className='dark:text-gray-100'>
+                        {faq.question}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p>{faq.answer}</p>
+                      <p className='dark:text-gray-300'>{faq.answer}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -83,7 +89,7 @@ const HelpSupportPage = () => {
         return (
           <form onSubmit={submitSupportTicket} className='space-y-6'>
             <div>
-              <label className='block text-sm font-medium text-gray-700'>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Support Ticket Subject
               </label>
               <input
@@ -91,11 +97,11 @@ const HelpSupportPage = () => {
                 value={ticketSubject}
                 onChange={(e) => setTicketSubject(e.target.value)}
                 required
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm'
+                className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium text-gray-700'>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Describe Your Issue
               </label>
               <textarea
@@ -103,7 +109,7 @@ const HelpSupportPage = () => {
                 value={ticketDescription}
                 onChange={(e) => setTicketDescription(e.target.value)}
                 required
-                className='mt-1 block w-full rounded-md border-gray-300 shadow-sm'
+                className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
               />
             </div>
             <Button type='submit' variant='default'>
@@ -114,28 +120,37 @@ const HelpSupportPage = () => {
       case "contact":
         return (
           <div className='space-y-6'>
-            <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md'>
-              <h3 className='text-xl font-semibold mb-4'>
+            <div className='bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md'>
+              <h3 className='text-xl font-semibold mb-4 dark:text-gray-100'>
                 Contact Information
               </h3>
               <div className='space-y-4'>
                 <div className='flex items-center'>
-                  <MailIcon className='mr-4 text-indigo-600' size={24} />
+                  <MailIcon
+                    className='mr-4 text-indigo-600 dark:text-indigo-400'
+                    size={24}
+                  />
                   <div>
-                    <p className='font-medium'>Email Support</p>
-                    <p className='text-gray-600'>
+                    <p className='font-medium dark:text-gray-100'>
+                      Email Support
+                    </p>
+                    <p className='text-gray-600 dark:text-gray-300'>
                       support@fundraiseplatform.com
                     </p>
                   </div>
                 </div>
                 <div className='flex items-center'>
                   <MessageCircleIcon
-                    className='mr-4 text-indigo-600'
+                    className='mr-4 text-indigo-600 dark:text-indigo-400'
                     size={24}
                   />
                   <div>
-                    <p className='font-medium'>Live Chat Hours</p>
-                    <p className='text-gray-600'>Mon-Fri, 9 AM - 5 PM EST</p>
+                    <p className='font-medium dark:text-gray-100'>
+                      Live Chat Hours
+                    </p>
+                    <p className='text-gray-600 dark:text-gray-300'>
+                      Mon-Fri, 9 AM - 5 PM EST
+                    </p>
                   </div>
                 </div>
               </div>
@@ -148,21 +163,20 @@ const HelpSupportPage = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gray-100 dark:bg-gray-900'>
+    <div className='min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-300'>
       <Navbar />
-      <div className='container mx-auto py-12 px-4'>
+      <div className='container mt-10 mx-auto py-12 px-4'>
         <div className='text-center mb-12'>
-          <h1 className='text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600'>
+          <h1 className='text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>
             Help & Support Center
           </h1>
-          <p className='text-gray-600 max-w-2xl mx-auto'>
+          <p className='text-gray-600 dark:text-gray-400 max-w-2xl mx-auto'>
             We're here to help you navigate our platform, answer your questions,
             and provide support whenever you need it.
           </p>
         </div>
 
         <div className='grid md:grid-cols-4 gap-8'>
-          {/* Sidebar Navigation */}
           <div className='bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md'>
             <nav className='space-y-2'>
               <Button
@@ -190,7 +204,6 @@ const HelpSupportPage = () => {
             </nav>
           </div>
 
-          {/* Main Content Area */}
           <div className='md:col-span-3 bg-white dark:bg-gray-800 rounded-lg p-8 shadow-md'>
             {renderContent()}
           </div>

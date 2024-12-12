@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,6 +22,7 @@ import DataProtection from "./components/footer/DataProtectionPage";
 import TermsOfService from "./components/footer/TermsOfServicePage";
 import PrivacyPolicy from "./components/footer/PrivacyPolicyPage";
 import FAQPage from "./components/footer/FaqPage";
+import AppToaster from "./components/AppToaster";
 
 function App() {
   return (
@@ -60,6 +60,7 @@ function App() {
         <Route path='/data-protection' element={<DataProtection />} />
         <Route path='/faq' element={<FAQPage />} />
       </Routes>
+      <AppToaster />
     </Router>
   );
 }
