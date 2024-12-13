@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { toast, Toaster } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +29,8 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+import apiConfig from "@/config/apiConfig";
+import axios from "axios";
 
 // Password strength meter component
 const PasswordStrengthMeter = ({ password }) => {
@@ -78,11 +82,12 @@ const PasswordStrengthMeter = ({ password }) => {
     </div>
   );
 };
-
 const Register = () => {
+  const navigate = useNavigate();
+
   const [registerData, setRegisterData] = useState({
-    username: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     role: "donor",
@@ -90,35 +95,63 @@ const Register = () => {
   });
 
   const [validationErrors, setValidationErrors] = useState({
-    username: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     termsAccepted: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Add handleChange method
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: "",
+      }));
+    }
+  };
+
+  // Add handleRoleChange method
+  const handleRoleChange = (value) => {
+    setRegisterData((prevData) => ({
+      ...prevData,
+      role: value,
+    }));
+  };
+
+  // Rest of the component remains the same (validateForm, handleSubmit, return)
   const validateForm = () => {
     const errors = {
-      username: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       termsAccepted: "",
     };
 
-    // Username validation
-    if (registerData.username.length < 3) {
-      errors.username = "Username must be at least 3 characters long";
-    } else if (registerData.username.length > 20) {
-      errors.username = "Username cannot exceed 20 characters";
-    }
-
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(registerData.email)) {
       errors.email = "Please enter a valid email address";
+    }
+
+    // Phone number validation (supports various international formats)
+    const phoneRegex =
+      /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+    if (!phoneRegex.test(registerData.phone)) {
+      errors.phone = "Please enter a valid phone number";
     }
 
     // Password validation
@@ -143,320 +176,335 @@ const Register = () => {
     return Object.values(errors).every((error) => error === "");
   };
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setRegisterData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-
-    if (name !== "termsAccepted") {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    }
-  };
-
-  const handleRoleChange = (value) => {
-    setRegisterData((prev) => ({
-      ...prev,
-      role: value,
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError(""); // Reset any previous API errors
+
     if (validateForm()) {
+      setIsLoading(true);
       try {
-        console.log("Registration Data:", registerData);
-        alert("Registration successful!");
+        const { confirmPassword, ...submitData } = registerData;
+
+        // Use the correct backend endpoint
+        const response = await apiConfig.post(
+          "/auth/register", // Corrected URL path
+          submitData,
+          {
+            withCredentials: true, // Important for sending cookies
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // Show success toast
+        toast.success("Account created successfully!", {
+          duration: 4000,
+          position: "top-right",
+          style: {
+            background: "#4CAF50",
+            color: "white",
+            fontWeight: "bold",
+          },
+          icon: "🎉",
+        });
+
+        // Navigate to login page after a short delay
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } catch (error) {
-        console.error("Registration failed", error);
-        alert("Registration failed. Please try again.");
+        // Handle registration errors
+        if (axios.isAxiosError(error)) {
+          const errorMessage =
+            error.response?.data?.error ||
+            error.response?.data?.message ||
+            "Registration failed. Please try again.";
+
+          // Show error toast
+          toast.error(errorMessage, {
+            duration: 4000,
+            position: "top-right",
+            style: {
+              background: "#F44336",
+              color: "white",
+              fontWeight: "bold",
+            },
+          });
+
+          setApiError(errorMessage);
+          console.error("Registration error:", errorMessage);
+        } else {
+          toast.error("An unexpected error occurred", {
+            duration: 4000,
+            position: "top-right",
+          });
+          setApiError("An unexpected error occurred");
+        }
+      } finally {
+        setIsLoading(false);
       }
     }
   };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4'
-    >
-      <Card className='w-full max-w-md shadow-2xl border-none rounded-2xl overflow-hidden'>
-        <CardHeader className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-6'>
-          <motion.div
-            initial={{ rotate: -20, scale: 0.8 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 300 }}
-            className='flex items-center justify-center mb-4'
-          >
-            <UserPlus className='text-white' size={48} />
-          </motion.div>
-          <CardTitle className='text-2xl font-bold text-center'>
-            Create Your Account
-          </CardTitle>
-          <CardDescription className='text-white/80 text-center'>
-            Join our community and start making an impact
-          </CardDescription>
-        </CardHeader>
-        <CardContent className='bg-white p-6 space-y-4'>
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Username Input */}
-            <div>
-              <Label
-                htmlFor='username'
-                className='flex items-center justify-between'
+    <>
+      <Toaster />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4'
+      >
+        <Card className='w-full max-w-md shadow-2xl border-none rounded-2xl overflow-hidden'>
+          <CardHeader className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-6'>
+            <motion.div
+              initial={{ rotate: -20, scale: 0.8 }}
+              animate={{ rotate: 0, scale: 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className='flex items-center justify-center mb-4'
+            >
+              <UserPlus className='text-white' size={48} />
+            </motion.div>
+            <CardTitle className='text-2xl font-bold text-center'>
+              Create Your Account
+            </CardTitle>
+            <CardDescription className='text-white/80 text-center'>
+              Join our community and start making an impact
+            </CardDescription>
+          </CardHeader>
+          <CardContent className='bg-white p-6 space-y-4'>
+            {/* API Error Display */}
+            {apiError && (
+              <div
+                className='bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded relative mb-4'
+                role='alert'
               >
-                <span>Username</span>
-                {registerData.username && !validationErrors.username && (
-                  <CheckCircle2 className='text-green-500' size={16} />
-                )}
-              </Label>
-              <div className='relative'>
+                <span className='block sm:inline'>{apiError}</span>
+              </div>
+            )}
+            <form onSubmit={handleSubmit} className='space-y-4'>
+              {/* Email Input */}
+              <div>
+                <Label htmlFor='email' className='flex items-center'>
+                  Email Address
+                  {registerData.email && !validationErrors.email && (
+                    <CheckCircle2 className='ml-2 text-green-500' size={16} />
+                  )}
+                </Label>
                 <Input
-                  type='text'
-                  name='username'
-                  value={registerData.username}
+                  type='email'
+                  name='email'
+                  value={registerData.email}
                   onChange={handleChange}
-                  placeholder='Choose a unique username'
+                  placeholder='Enter your email'
                   className={`${
-                    validationErrors.username
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } pr-10`}
+                    validationErrors.email ? "border-red-500" : ""
+                  }`}
                 />
-                {registerData.username.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className='absolute right-3 top-1/2 transform -translate-y-1/2'
-                  >
-                    {validationErrors.username ? (
-                      <AlertCircle className='text-red-500' size={20} />
-                    ) : (
-                      <CheckCircle2 className='text-green-500' size={20} />
-                    )}
-                  </motion.div>
+                {validationErrors.email && (
+                  <p className='text-red-500 text-sm mt-1 flex items-center'>
+                    <AlertCircle className='mr-2' size={16} />
+                    {validationErrors.email}
+                  </p>
                 )}
               </div>
+
+              {/* Phone Number Input */}
+              <div>
+                <Label htmlFor='phone' className='flex items-center'>
+                  Phone Number
+                  {registerData.phone && !validationErrors.phone && (
+                    <CheckCircle2 className='ml-2 text-green-500' size={16} />
+                  )}
+                </Label>
+                <Input
+                  type='tel'
+                  name='phone'
+                  value={registerData.phone}
+                  onChange={handleChange}
+                  placeholder='Enter your phone number'
+                  className={`${
+                    validationErrors.phone ? "border-red-500" : ""
+                  }`}
+                />
+                {validationErrors.phone && (
+                  <p className='text-red-500 text-sm mt-1 flex items-center'>
+                    <AlertCircle className='mr-2' size={16} />
+                    {validationErrors.phone}
+                  </p>
+                )}
+              </div>
+
+              {/* Password Input with Strength Meter */}
+              <div>
+                <Label htmlFor='password' className='flex items-center'>
+                  Password
+                  <Lock className='ml-2 text-gray-400' size={16} />
+                </Label>
+                <div className='relative'>
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    name='password'
+                    value={registerData.password}
+                    onChange={handleChange}
+                    placeholder='Create a strong password'
+                    className={`${
+                      validationErrors.password
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } pr-10`}
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowPassword(!showPassword)}
+                    className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
+                  >
+                    {showPassword ? <Shield size={20} /> : <Zap size={20} />}
+                  </button>
+                </div>
+                {validationErrors.password && (
+                  <p className='text-red-500 text-sm mt-1 flex items-center'>
+                    <AlertCircle className='mr-2' size={16} />
+                    {validationErrors.password}
+                  </p>
+                )}
+                <PasswordStrengthMeter password={registerData.password} />
+              </div>
+
+              {/* Confirm Password Input */}
+              <div>
+                <Label htmlFor='confirmPassword' className='flex items-center'>
+                  Confirm Password
+                  {registerData.confirmPassword &&
+                    registerData.password === registerData.confirmPassword && (
+                      <CheckCircle2 className='ml-2 text-green-500' size={16} />
+                    )}
+                </Label>
+                <Input
+                  type='password'
+                  name='confirmPassword'
+                  value={registerData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder='Repeat your password'
+                  className={`${
+                    validationErrors.confirmPassword ? "border-red-500" : ""
+                  }`}
+                />
+                {validationErrors.confirmPassword && (
+                  <p className='text-red-500 text-sm mt-1 flex items-center'>
+                    <AlertCircle className='mr-2' size={16} />
+                    {validationErrors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Role Selection */}
+              <div>
+                <Label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Select Your Role
+                </Label>
+                <Select
+                  value={registerData.role}
+                  onValueChange={handleRoleChange}
+                >
+                  <SelectTrigger
+                    className='w-full border-2 border-indigo-200 hover:border-indigo-400 transition-colors duration-300
+                 bg-white shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-200
+                 text-gray-800 font-medium'
+                  >
+                    <SelectValue placeholder='Choose your community role' />
+                  </SelectTrigger>
+                  <SelectContent
+                    className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+                  >
+                    <div className='p-1'>
+                      <SelectItem
+                        value='donor'
+                        className='flex items-center justify-between hover:bg-indigo-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
+                      >
+                        <div className='flex items-center'>
+                          <span className='mr-3 text-indigo-600 group-hover:text-indigo-800'>
+                            💰
+                          </span>
+                          <span>Donor</span>
+                        </div>
+                        <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
+                          Support causes you care about
+                        </span>
+                      </SelectItem>
+
+                      <SelectItem
+                        value='campaigner'
+                        className='flex items-center justify-between hover:bg-green-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
+                      >
+                        <div className='flex items-center'>
+                          <span className='mr-3 text-green-600 group-hover:text-green-800'>
+                            🚀
+                          </span>
+                          <span>Campaign Creator</span>
+                        </div>
+                        <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
+                          Launch and manage campaigns
+                        </span>
+                      </SelectItem>
+                    </div>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='terms'
+                  name='termsAccepted'
+                  checked={registerData.termsAccepted}
+                  onCheckedChange={(checked) =>
+                    setRegisterData((prev) => ({
+                      ...prev,
+                      termsAccepted: checked,
+                    }))
+                  }
+                />
+                <Label htmlFor='terms' className='text-sm text-gray-700'>
+                  I accept the Terms and Conditions
+                </Label>
+              </div>
               <AnimatePresence>
-                {validationErrors.username && (
+                {validationErrors.termsAccepted && (
                   <motion.p
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className='text-red-500 text-sm mt-1'
+                    className='text-red-500 text-sm flex items-center'
                   >
-                    {validationErrors.username}
+                    <AlertCircle className='mr-2' size={16} />
+                    {validationErrors.termsAccepted}
                   </motion.p>
                 )}
               </AnimatePresence>
-            </div>
 
-            {/* Email Input */}
-            <div>
-              <Label htmlFor='email' className='flex items-center'>
-                Email Address
-                {registerData.email && !validationErrors.email && (
-                  <CheckCircle2 className='ml-2 text-green-500' size={16} />
-                )}
-              </Label>
-              <Input
-                type='email'
-                name='email'
-                value={registerData.email}
-                onChange={handleChange}
-                placeholder='Enter your email'
-                className={`${validationErrors.email ? "border-red-500" : ""}`}
-              />
-              {validationErrors.email && (
-                <p className='text-red-500 text-sm mt-1 flex items-center'>
-                  <AlertCircle className='mr-2' size={16} />
-                  {validationErrors.email}
-                </p>
-              )}
-            </div>
-
-            {/* Password Input with Strength Meter */}
-            <div>
-              <Label htmlFor='password' className='flex items-center'>
-                Password
-                <Lock className='ml-2 text-gray-400' size={16} />
-              </Label>
-              <div className='relative'>
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  name='password'
-                  value={registerData.password}
-                  onChange={handleChange}
-                  placeholder='Create a strong password'
-                  className={`${
-                    validationErrors.password
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } pr-10`}
-                />
-                <button
-                  type='button'
-                  onClick={() => setShowPassword(!showPassword)}
-                  className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700'
-                >
-                  {showPassword ? <Shield size={20} /> : <Zap size={20} />}
-                </button>
-              </div>
-              {validationErrors.password && (
-                <p className='text-red-500 text-sm mt-1 flex items-center'>
-                  <AlertCircle className='mr-2' size={16} />
-                  {validationErrors.password}
-                </p>
-              )}
-              <PasswordStrengthMeter password={registerData.password} />
-            </div>
-
-            {/* Confirm Password Input */}
-            <div>
-              <Label htmlFor='confirmPassword' className='flex items-center'>
-                Confirm Password
-                {registerData.confirmPassword &&
-                  registerData.password === registerData.confirmPassword && (
-                    <CheckCircle2 className='ml-2 text-green-500' size={16} />
-                  )}
-              </Label>
-              <Input
-                type='password'
-                name='confirmPassword'
-                value={registerData.confirmPassword}
-                onChange={handleChange}
-                placeholder='Repeat your password'
-                className={`${
-                  validationErrors.confirmPassword ? "border-red-500" : ""
-                }`}
-              />
-              {validationErrors.confirmPassword && (
-                <p className='text-red-500 text-sm mt-1 flex items-center'>
-                  <AlertCircle className='mr-2' size={16} />
-                  {validationErrors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <Label className='mb-2 block text-sm font-medium text-gray-700'>
-                Select Your Role
-              </Label>
-              <Select
-                value={registerData.role}
-                onValueChange={handleRoleChange}
+              {/* Submit Button with Animation */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <SelectTrigger
-                  className='w-full border-2 border-indigo-200 hover:border-indigo-400 transition-colors duration-300 
-                 bg-white shadow-sm rounded-lg focus:ring-2 focus:ring-indigo-200 
-                 text-gray-800 font-medium'
+                <Button
+                  type='submit'
+                  disabled={isLoading}
+                  className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white 
+                hover:from-indigo-700 hover:to-purple-700 
+                transition-all duration-300 ease-in-out
+                disabled:opacity-50 disabled:cursor-not-allowed'
                 >
-                  <SelectValue placeholder='Choose your community role' />
-                </SelectTrigger>
-                <SelectContent
-                  className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl 
-                 border border-gray-100 ring-1 ring-black ring-opacity-5'
-                >
-                  <div className='p-1'>
-                    <SelectItem
-                      value='donor'
-                      className='flex items-center justify-between hover:bg-indigo-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
-                    >
-                      <div className='flex items-center'>
-                        <span className='mr-3 text-indigo-600 group-hover:text-indigo-800'>
-                          💰
-                        </span>
-                        <span>Donor</span>
-                      </div>
-                      <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
-                        Support causes you care about
-                      </span>
-                    </SelectItem>
-
-                    <SelectItem
-                      value='campaigner'
-                      className='flex items-center justify-between hover:bg-green-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
-                    >
-                      <div className='flex items-center'>
-                        <span className='mr-3 text-green-600 group-hover:text-green-800'>
-                          🚀
-                        </span>
-                        <span>Campaign Creator</span>
-                      </div>
-                      <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
-                        Launch and manage campaigns
-                      </span>
-                    </SelectItem>
-
-                    <SelectItem
-                      value='volunteer'
-                      className='flex items-center justify-between hover:bg-orange-50 rounded-md transition-colors cursor-pointer px-3 py-2 group'
-                    >
-                      <div className='flex items-center'>
-                        <span className='mr-3 text-orange-600 group-hover:text-orange-800'>
-                          ❤️
-                        </span>
-                        <span>Volunteer</span>
-                      </div>
-                      <span className='text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity'>
-                        Make a difference in your community
-                      </span>
-                    </SelectItem>
-                  </div>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Terms and Conditions */}
-            <div className='flex items-center space-x-2'>
-              <Checkbox
-                id='terms'
-                name='termsAccepted'
-                checked={registerData.termsAccepted}
-                onCheckedChange={(checked) =>
-                  setRegisterData((prev) => ({
-                    ...prev,
-                    termsAccepted: checked,
-                  }))
-                }
-              />
-              <Label htmlFor='terms' className='text-sm text-gray-700'>
-                I accept the Terms and Conditions
-              </Label>
-            </div>
-            <AnimatePresence>
-              {validationErrors.termsAccepted && (
-                <motion.p
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className='text-red-500 text-sm flex items-center'
-                >
-                  <AlertCircle className='mr-2' size={16} />
-                  {validationErrors.termsAccepted}
-                </motion.p>
-              )}
-            </AnimatePresence>
-
-            {/* Submit Button with Animation */}
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                type='submit'
-                className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-md shadow-lg transition-all'
-              >
-                Create Account
-              </Button>
-            </motion.div>
-          </form>
-        </CardContent>
-      </Card>
-    </motion.div>
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
+              </motion.div>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </>
   );
 };
 

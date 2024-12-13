@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Home as HomeIcon,
   Rocket as RocketIcon,
@@ -7,30 +7,47 @@ import {
   Menu as MenuIcon,
   Sun as SunIcon,
   Moon as MoonIcon,
+  LogOut as LogOutIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import apiConfig from "../config/apiConfig";
 
 export default function Navbar() {
   // State for mobile menu and theme
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const navigate = useNavigate(); // Add navigation hook
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
-  // Effect to handle theme changes and persist preference
+  // Effect to check login status and handle theme
   useEffect(() => {
+    // Check theme
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       setIsDarkMode(savedTheme === "dark");
       document.documentElement.classList.toggle("dark", savedTheme === "dark");
     } else {
-      // Check system preference
       const prefersDarkMode = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
       setIsDarkMode(prefersDarkMode);
       document.documentElement.classList.toggle("dark", prefersDarkMode);
     }
+
+    // Check login status by calling a protected endpoint
+    const checkLoginStatus = async () => {
+      try {
+        // Call a backend endpoint to verify authentication
+        await apiConfig.get("/auth/status");
+        setIsLoggedIn(true);
+      } catch (error) {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkLoginStatus();
   }, []);
 
   // Toggle theme function
@@ -41,7 +58,32 @@ export default function Navbar() {
     localStorage.setItem("theme", newTheme ? "dark" : "light");
   };
 
-  // Navigation links data for DRY code
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint to invalidate session
+      await apiConfig.post(
+        "/auth/logout",
+        {},
+        {
+          withCredentials: true, // Important for sending cookies
+        }
+      );
+
+      // Update login state
+      setIsLoggedIn(false);
+
+      // Show success message and redirect
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (error) {
+      // Handle logout error
+      toast.error("Logout failed. Please try again.");
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Navigation links data
   const navLinks = [
     {
       href: "/",
@@ -49,7 +91,7 @@ export default function Navbar() {
       Icon: HomeIcon,
     },
     {
-      href: "/campaigns",
+      href: "/explore-campaigns",
       label: "Campaigns",
       Icon: RocketIcon,
     },
@@ -59,7 +101,7 @@ export default function Navbar() {
       Icon: CreditCardIcon,
     },
     {
-      href: "/support",
+      href: "/help-support",
       label: "Support",
       Icon: MessageCircleIcon,
     },
@@ -87,7 +129,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Theme Toggle and Authentication Buttons */}
+        {/* Theme Toggle and Authentication/Logout Buttons */}
         <div className='hidden md:flex items-center space-x-4'>
           {/* Theme Toggle */}
           <Button
@@ -99,20 +141,31 @@ export default function Navbar() {
             {isDarkMode ? <SunIcon size={20} /> : <MoonIcon size={20} />}
           </Button>
 
-          {/* Authentication Buttons */}
-          <Button
-            variant='outline'
-            onClick={() => navigate("/login")}
-            className='border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-          >
-            Login
-          </Button>
-          <Button
-            onClick={() => navigate("/register")}
-            className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500'
-          >
-            Register
-          </Button>
+          {/* Authentication/Logout Buttons */}
+          {!isLoggedIn ? (
+            <>
+              <Button
+                variant='outline'
+                onClick={() => navigate("/login")}
+                className='border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => navigate("/register")}
+                className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500'
+              >
+                Register
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleLogout}
+              className='bg-red-500 hover:bg-red-600 text-white'
+            >
+              <LogOutIcon size={18} className='mr-2' /> Logout
+            </Button>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -129,6 +182,7 @@ export default function Navbar() {
             variant='ghost'
             size='icon'
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className='text-gray-600 dark:text-gray-300'
           >
             <MenuIcon />
           </Button>
@@ -148,20 +202,30 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className='flex space-x-2 pt-2'>
-                <Button
-                  variant='outline'
-                  onClick={() => navigate("/login")}
-                  className='border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                >
-                  Login
-                </Button>
-
-                <Button
-                  onClick={() => navigate("/register")}
-                  className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500'
-                >
-                  Register
-                </Button>
+                {!isLoggedIn ? (
+                  <>
+                    <Button
+                      variant='outline'
+                      onClick={() => navigate("/login")}
+                      className='border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    >
+                      Login
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/register")}
+                      className='bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500'
+                    >
+                      Register
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={handleLogout}
+                    className='w-full bg-red-500 hover:bg-red-600 text-white'
+                  >
+                    <LogOutIcon size={18} className='mr-2' /> Logout
+                  </Button>
+                )}
               </div>
             </div>
           </div>

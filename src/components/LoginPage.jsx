@@ -30,6 +30,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+import apiConfig from "@/config/apiConfig";
 
 const LoginPage = () => {
   const [loginData, setLoginData] = useState({
@@ -63,33 +64,46 @@ const LoginPage = () => {
     }
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await apiConfig.post(
+        "/auth/login",
+        {
+          email: loginData.email,
+          password: loginData.password,
         },
-        body: JSON.stringify(loginData),
-      });
+        {
+          // Important: Include credentials to allow cookies to be set
+          withCredentials: true,
+        }
+      );
 
-      if (response.ok) {
-        // Redirect or handle successful login
-        window.location.href = "/dashboard";
-      } else {
-        // Handle login error
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
-      }
+      console.log("Login response:", response.data);
+
+      // Redirect to dashboard
+      window.location.href = "/";
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred during login");
+
+      // Handle different types of errors
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(error.response.data.error || "Login failed");
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please check your connection.");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError("An error occurred during login");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialLogin = (provider) => {
-    // Redirect to backend social login route
-    window.location.href = `/api/auth/${provider}`;
+    // Redirect to backend social login endpoint
+    // This assumes your backend has corresponding social login routes
+    window.location.href = `${apiConfig.baseURL}/auth/${provider}`;
   };
 
   return (
@@ -225,7 +239,7 @@ const LoginPage = () => {
           </div>
 
           <div className='text-center text-sm text-gray-600 mt-6'>
-            Don't have an account?{" "}
+            Don't have an account?
             <Button
               variant='link'
               size='sm'
