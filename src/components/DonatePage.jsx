@@ -15,11 +15,15 @@ import {
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "@/components/Footer";
+import toast from "react-hot-toast";
+import apiConfig from "@/config/apiConfig";
 
 const DonatePage = () => {
   const [donationAmount, setDonationAmount] = useState("");
   const [customAmount, setCustomAmount] = useState("");
   const [selectedCampaign, setSelectedCampaign] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Predefined donation amounts
   const donationPresets = [25, 50, 100, 250, 500];
@@ -68,13 +72,85 @@ const DonatePage = () => {
     setCustomAmount(e.target.value);
   };
 
-  const handleDonation = () => {
-    // Placeholder for donation submission logic
-    console.log("Donation submitted", {
-      amount: donationAmount,
-      campaign: selectedCampaign,
-    });
-    // TODO: Implement actual donation submission
+  const handleDonation = async () => {
+    try {
+      // Start loading state
+      setIsLoading(true);
+
+      // Prepare the data for submission
+      const submitData = {
+        donationId: "123254689", // Replace with dynamic data as needed
+        amount: donationAmount,
+        campaign: selectedCampaign,
+      };
+
+      // Make API call to process the donation
+      const response = await apiConfig.post("/donate/stripe", submitData);
+
+      console.log(response.url);
+      // Automatically redirect the browser to the new URL
+      window.location.href = response.data;
+
+      // Show a detailed success toast
+      toast.success(`Payment successful! 🎉`, {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#4caf50",
+          color: "white",
+          padding: "16px",
+          borderRadius: "8px",
+        },
+      });
+
+      console.log("Donation processed successfully:", response.data);
+    } catch (error) {
+      // Handle different types of errors
+      console.error("Donation submission error:", error);
+
+      if (error.response) {
+        // Server responded with an error
+        setError(
+          error.response.data.message || "Failed to process the donation."
+        );
+      } else if (error.request) {
+        // Request made but no response received
+        setError("No response from server. Please check your connection.");
+      } else {
+        // Something else went wrong
+        setError(error.message || "An unexpected error occurred.");
+      }
+    } finally {
+      // Stop loading state
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    // Validation
+    if (campaignData.title.length < 5) {
+      setError("Campaign title must be at least 5 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    if (parseFloat(campaignData.fundraisingGoal) < 100) {
+      setError("Fundraising goal must be at least $100");
+      setIsLoading(false);
+      return;
+    }
+
+    const endDate = new Date(campaignData.endDate);
+    const today = new Date();
+    if (endDate <= today) {
+      setError("Campaign end date must be in the future");
+      setIsLoading(false);
+      return;
+    }
   };
 
   return (
@@ -82,26 +158,26 @@ const DonatePage = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className='min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900'
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900"
     >
       <Navbar />
 
-      <div className='container mx-auto px-4 py-24'>
-        <div className='grid md:grid-cols-2 gap-12'>
+      <div className="container mx-auto px-4 py-24">
+        <div className="grid md:grid-cols-2 gap-12">
           {/* Donation Form Section */}
           <div>
-            <h1 className='text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>
+            <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
               Make a Difference Today
             </h1>
-            <p className='text-gray-600 dark:text-gray-300 mb-8'>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
               Your contribution can transform lives. Choose an amount and a
               campaign that resonates with your heart.
             </p>
 
             {/* Campaign Selection */}
-            <div className='mb-6'>
-              <Label className='block mb-2'>Select Campaign</Label>
-              <div className='grid md:grid-cols-3 gap-4'>
+            <div className="mb-6">
+              <Label className="block mb-2">Select Campaign</Label>
+              <div className="grid md:grid-cols-3 gap-4">
                 {featuredCampaigns.map((campaign) => (
                   <button
                     key={campaign.id}
@@ -138,9 +214,9 @@ const DonatePage = () => {
             </div>
 
             {/* Donation Amount Selection */}
-            <div className='mb-6'>
-              <Label className='block mb-2'>Donation Amount</Label>
-              <div className='flex flex-wrap gap-3 mb-4'>
+            <div className="mb-6">
+              <Label className="block mb-2">Donation Amount</Label>
+              <div className="flex flex-wrap gap-3 mb-4">
                 {donationPresets.map((amount) => (
                   <button
                     key={amount}
@@ -158,46 +234,46 @@ const DonatePage = () => {
                   </button>
                 ))}
               </div>
-              <div className='flex items-center'>
-                <div className='relative flex-grow'>
+              <div className="flex items-center">
+                <div className="relative flex-grow">
                   <DollarSignIcon
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                     size={20}
                   />
                   <Input
-                    type='number'
-                    placeholder='Enter custom amount'
+                    type="number"
+                    placeholder="Enter custom amount"
                     value={customAmount}
                     onChange={handleCustomAmountChange}
-                    className='pl-10'
+                    className="pl-10"
                   />
                 </div>
               </div>
             </div>
 
             {/* Donor Information */}
-            <div className='space-y-4 mb-6'>
+            <div className="space-y-4 mb-6">
               <div>
                 <Label>Full Name</Label>
-                <div className='relative'>
+                <div className="relative">
                   <UserIcon
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                     size={20}
                   />
-                  <Input placeholder='Your full name' className='pl-10' />
+                  <Input placeholder="Your full name" className="pl-10" />
                 </div>
               </div>
               <div>
                 <Label>Email Address</Label>
-                <div className='relative'>
+                <div className="relative">
                   <MailIcon
-                    className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                     size={20}
                   />
                   <Input
-                    type='email'
-                    placeholder='your.email@example.com'
-                    className='pl-10'
+                    type="email"
+                    placeholder="your.email@example.com"
+                    className="pl-10"
                   />
                 </div>
               </div>
@@ -207,44 +283,44 @@ const DonatePage = () => {
             <Button
               onClick={handleDonation}
               disabled={!donationAmount || !selectedCampaign}
-              className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
             >
-              <CreditCardIcon className='mr-2' /> Donate Now
+              <CreditCardIcon className="mr-2" /> Donate Now
             </Button>
           </div>
 
           {/* Campaign Impact Section */}
           <div>
-            <h2 className='text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>
+            <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
               Campaign Highlights
             </h2>
             {featuredCampaigns.map((campaign) => (
               <Card
                 key={campaign.id}
-                className='mb-6 hover:shadow-xl transition-all'
+                className="mb-6 hover:shadow-xl transition-all"
               >
-                <CardHeader className='flex flex-row items-center space-x-4'>
+                <CardHeader className="flex flex-row items-center space-x-4">
                   <campaign.icon
-                    className='text-indigo-600 dark:text-indigo-400'
+                    className="text-indigo-600 dark:text-indigo-400"
                     size={36}
                   />
                   <CardTitle>{campaign.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className='text-gray-600 dark:text-gray-300 mb-4'>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
                     {campaign.description}
                   </p>
-                  <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
+                  <div className="flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400">
                     <span>Goal: {campaign.goal}</span>
                     <span>Raised: {campaign.raised}</span>
                   </div>
-                  <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
                     <div
-                      className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full"
                       style={{ width: `${campaign.progress}%` }}
                     />
                   </div>
-                  <div className='text-sm text-gray-600 dark:text-gray-400 text-right'>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 text-right">
                     {campaign.progress}% Funded
                   </div>
                 </CardContent>
