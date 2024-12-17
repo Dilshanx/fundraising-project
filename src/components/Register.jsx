@@ -156,10 +156,11 @@ const Register = () => {
 
     // Password validation
     const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]{8,}$/;
+
     if (!passwordRegex.test(registerData.password)) {
       errors.password =
-        "Password must include uppercase, lowercase, number, and special character";
+        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character";
     }
 
     // Confirm password validation
