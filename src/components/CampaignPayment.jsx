@@ -10,51 +10,47 @@ import {
   UserIcon,
   MailIcon,
   CreditCardIcon,
-  GlobeIcon,
-  School2Icon,
-  HospitalIcon,
-  LeafIcon,
-  UsersIcon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "@/components/Footer";
 import toast from "react-hot-toast";
 import apiConfig from "@/config/apiConfig";
 
-const DonatePage = () => {
+const CampaignPayment = () => {
+  const { campaignId } = useParams();
   const [donationAmount, setDonationAmount] = useState("");
   const [customAmount, setCustomAmount] = useState("");
-  const [selectedCampaignId, setSelectedCampaignId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [featuredCampaigns, setFeaturedCampaigns] = useState([]);
+  const [campaign, setCampaign] = useState(null);
+  const location = useLocation();
 
   // Predefined donation amounts
   const donationPresets = [25, 50, 100, 250, 500];
 
-  // Fetch Campaigns from API on component mount
+  // Fetch single campaign data on mount
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchCampaign = async () => {
       try {
         setIsLoading(true);
-        const response = await apiConfig.get("/campaigns");
-        setFeaturedCampaigns(response.data.data);
+        const response = await apiConfig.get(`/campaigns/${campaignId}`);
+        setCampaign(response.data.data);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching campaigns:", error);
-        setError(
-          "Failed to load campaigns. Please check your connection and try again."
-        );
         setIsLoading(false);
+        console.error("Error fetching campaign:", error);
+        setError(
+          "Failed to load campaign details. Please check your connection and try again."
+        );
         toast.error(error.message);
       }
     };
 
-    fetchCampaigns();
-  }, []);
+    fetchCampaign();
+  }, [campaignId]);
 
   const handleDonationAmountSelect = (amount) => {
     setDonationAmount(amount);
@@ -84,21 +80,11 @@ const DonatePage = () => {
   const isFormValid = () => {
     return (
       donationAmount > 0 &&
-      selectedCampaignId &&
+      campaignId &&
       fullName.trim() !== "" &&
       validateEmail(email)
     );
   };
-
-  const categoryIcons = {
-    Education: School2Icon,
-    Healthcare: HospitalIcon,
-    "Community Development": UsersIcon,
-    Environmental: LeafIcon,
-    "Medical Research": GlobeIcon,
-    "Humanitarian Aid": HeartIcon,
-  };
-
   const handleDonation = async () => {
     if (!isFormValid()) {
       toast.error("Please fill out the form correctly");
@@ -110,18 +96,17 @@ const DonatePage = () => {
       const submitData = {
         donationId: Date.now().toString(),
         amount: donationAmount,
-        campaignId: selectedCampaignId,
+        campaignId: campaignId,
       };
 
       const response = await apiConfig.post("/donate/stripe", submitData, {
         withCredentials: true,
       });
 
-      // Check if response.data.url exists (as seen in the backend code)
-      if (response.data?.url) {
-        window.location.href = response.data.url;
+      if (response.status === 200) {
+        window.location.href = response.data;
       } else {
-        throw new Error("Invalid response format from server");
+        throw new Error("Failed to create Stripe session");
       }
     } catch (error) {
       console.error("Donation submission error:", error);
@@ -146,6 +131,17 @@ const DonatePage = () => {
     handleDonation();
   };
 
+  if (isLoading) {
+    return <p className='text-center'>Loading campaign details...</p>;
+  }
+  if (error) {
+    return <p className='text-center text-red-500'>{error}</p>;
+  }
+
+  if (!campaign) {
+    return <p className='text-center'>Campaign not found</p>;
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -160,60 +156,11 @@ const DonatePage = () => {
           {/* Donation Form Section */}
           <div>
             <h1 className='text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>
-              Make a Difference Today
+              {campaign.title}
             </h1>
             <p className='text-gray-600 dark:text-gray-300 mb-8'>
-              Your contribution can transform lives. Choose an amount and a
-              campaign that resonates with your heart.
+              {campaign.description}
             </p>
-
-            {/* Campaign Selection */}
-            <div className='mb-6'>
-              <Label className='block mb-2'>Select Campaign</Label>
-              <div className='grid md:grid-cols-3 gap-4'>
-                {isLoading ? (
-                  <p>Loading Campaigns</p>
-                ) : error ? (
-                  <p>{error}</p>
-                ) : (
-                  featuredCampaigns.map((campaign) => {
-                    const Icon = categoryIcons[campaign.category] || HeartIcon;
-                    return (
-                      <button
-                        key={campaign._id}
-                        onClick={() => setSelectedCampaignId(campaign._id)}
-                        className={`
-                          p-4 rounded-xl border transition-all 
-                          ${
-                            selectedCampaignId === campaign._id
-                              ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30"
-                              : "border-gray-200 dark:border-gray-700"
-                          }
-                        `}
-                      >
-                        <Icon
-                          className={`mx-auto mb-2 ${
-                            selectedCampaignId === campaign._id
-                              ? "text-indigo-600"
-                              : "text-gray-500 dark:text-gray-400"
-                          }`}
-                          size={36}
-                        />
-                        <h3
-                          className={`text-sm font-semibold ${
-                            selectedCampaignId === campaign._id
-                              ? "text-indigo-800 dark:text-indigo-300"
-                              : "text-gray-700 dark:text-gray-300"
-                          }`}
-                        >
-                          {campaign.title}
-                        </h3>
-                      </button>
-                    );
-                  })
-                )}
-              </div>
-            </div>
 
             {/* Donation Amount Selection */}
             <div className='mb-6'>
@@ -310,55 +257,40 @@ const DonatePage = () => {
             <h2 className='text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400'>
               Campaign Highlights
             </h2>
-            {isLoading ? (
-              <p>Loading Campaigns</p>
-            ) : error ? (
-              <p>{error}</p>
-            ) : (
-              featuredCampaigns.map((campaign) => {
-                const Icon = categoryIcons[campaign.category] || HeartIcon;
-                return (
-                  <Card
-                    key={campaign._id}
-                    className='mb-6 hover:shadow-xl transition-all'
-                  >
-                    <CardHeader className='flex flex-row items-center space-x-4'>
-                      <Icon
-                        className='text-indigo-600 dark:text-indigo-400'
-                        size={36}
-                      />
-                      <CardTitle>{campaign.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className='text-gray-600 dark:text-gray-300 mb-4'>
-                        {campaign.description}
-                      </p>
-                      <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
-                        <span>Goal: ${campaign.fundraisingGoal}</span>
-                        {/*  Calculate amount raised here based on donations */}
-                        <span>Raised: $0</span>
-                      </div>
-                      <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
-                        <div
-                          className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
-                          style={{ width: `0%` }}
-                        />
-                      </div>
-                      <div className='text-sm text-gray-600 dark:text-gray-400 text-right'>
-                        0% Funded
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
+            <Card className='mb-6 hover:shadow-xl transition-all'>
+              <CardHeader className='flex flex-row items-center space-x-4'>
+                <HeartIcon
+                  className='text-indigo-600 dark:text-indigo-400'
+                  size={36}
+                />
+                <CardTitle>{campaign.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className='text-gray-600 dark:text-gray-300 mb-4'>
+                  {campaign.description}
+                </p>
+                <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
+                  <span>Goal: ${campaign.fundraisingGoal}</span>
+                  {/*  Calculate amount raised here based on donations */}
+                  <span>Raised: $0</span>
+                </div>
+                <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
+                  <div
+                    className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
+                    style={{ width: `0%` }}
+                  />
+                </div>
+                <div className='text-sm text-gray-600 dark:text-gray-400 text-right'>
+                  0% Funded
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
-
       <Footer />
     </motion.div>
   );
 };
 
-export default DonatePage;
+export default CampaignPayment;

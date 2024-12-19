@@ -9,11 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "./Navbar";
 import Footer from "@/components/Footer";
+import apiConfig from "@/config/apiConfig";
+import toast from "react-hot-toast";
 
 const HelpSupportPage = () => {
   const [activeTab, setActiveTab] = useState("faq");
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const faqCategories = [
     {
@@ -48,12 +51,27 @@ const HelpSupportPage = () => {
     },
   ];
 
-  const submitSupportTicket = (e) => {
+  const submitSupportTicket = async (e) => {
     e.preventDefault();
-    console.log("Ticket submitted:", {
-      subject: ticketSubject,
-      description: ticketDescription,
-    });
+    setIsLoading(true);
+    try {
+      const response = await apiConfig.post("/support/tickets", {
+        subject: ticketSubject,
+        description: ticketDescription,
+      });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setTicketSubject("");
+        setTicketDescription("");
+      } else {
+        toast.error(response.data.message || "Error submitting ticket.");
+      }
+    } catch (error) {
+      toast.error(error.message);
+      console.error("Failed to submit support ticket:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderContent = () => {
@@ -112,8 +130,8 @@ const HelpSupportPage = () => {
                 className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
               />
             </div>
-            <Button type='submit' variant='default'>
-              Submit Support Ticket
+            <Button type='submit' variant='default' disabled={isLoading}>
+              {isLoading ? "Submitting..." : "Submit Support Ticket"}
             </Button>
           </form>
         );

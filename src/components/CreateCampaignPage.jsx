@@ -15,6 +15,12 @@ import {
   CalendarIcon,
   DollarSignIcon,
   AlertCircle,
+  HeartIcon,
+  GlobeIcon,
+  School2Icon,
+  HospitalIcon,
+  LeafIcon,
+  UsersIcon,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
@@ -42,6 +48,16 @@ const CreateCampaign = () => {
     "Medical Research",
     "Humanitarian Aid",
   ];
+
+  // Icon mapping for each category
+  const categoryIcons = {
+    Education: School2Icon,
+    Healthcare: HospitalIcon,
+    "Community Development": UsersIcon,
+    Environmental: LeafIcon,
+    "Medical Research": GlobeIcon,
+    "Humanitarian Aid": HeartIcon,
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -78,7 +94,9 @@ const CreateCampaign = () => {
       console.log("Submit data:", submitData);
 
       // Make API call to create campaign
-      const response = await apiConfig.post("/campaigns", submitData);
+      const response = await apiConfig.post("/campaigns", submitData, {
+        withCredentials: true,
+      });
 
       // Log the created campaign
       console.log("Campaign created:", response.data);
@@ -135,6 +153,8 @@ const CreateCampaign = () => {
     if (error) setError(null);
   };
 
+  const SelectedIcon = categoryIcons[campaignData.category] || RocketIcon;
+
   return (
     <div className='flex flex-col min-h-screen'>
       <Navbar />
@@ -148,7 +168,7 @@ const CreateCampaign = () => {
         <Card className='max-w-2xl mt-10 mx-auto bg-white dark:bg-gray-800'>
           <CardHeader>
             <CardTitle className='flex items-center text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
-              <RocketIcon className='mr-3' size={32} />
+              <SelectedIcon className='mr-3' size={32} />
               Create Your Fundraising Campaign
             </CardTitle>
             <p className='text-gray-600 dark:text-gray-300 mt-2'>
@@ -279,29 +299,18 @@ const CreateCampaign = () => {
                     <SelectValue placeholder='Select Campaign Category' />
                   </SelectTrigger>
                   <SelectContent className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl border boarder-gray-100 ring-1 ring-black ring-opacity-5'>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
+                    {categories.map((category) => {
+                      const Icon = categoryIcons[category] || RocketIcon;
+                      return (
+                        <SelectItem key={category} value={category}>
+                          <Icon className='mr-2 h-4 w-4 inline-block' />
+                          {category}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* <div>
-                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
-                  Campaign Image URL (Optional)
-                </label>
-                <Input
-                  type='url'
-                  placeholder='https://example.com/campaign-image.jpg'
-                  value={campaignData.imageUrl}
-                  onChange={(e) =>
-                    handleInputChange("imageUrl", e.target.value)
-                  }
-                  disabled={isLoading}
-                />
-              </div> */}
 
               <Button
                 type='submit'

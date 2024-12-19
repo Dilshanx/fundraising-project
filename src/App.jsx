@@ -23,6 +23,11 @@ import TermsOfService from "./components/footer/TermsOfServicePage";
 import PrivacyPolicy from "./components/footer/PrivacyPolicyPage";
 import FAQPage from "./components/footer/FaqPage";
 import AppToaster from "./components/AppToaster";
+import VerifyEmail from "./components/VerifyEmail";
+import VerificationSuccess from "./components/VerificationSuccess";
+import CampaignPayment from "./components/CampaignPayment";
+import DonorsPage from "./components/DonorsPage";
+import DonationSuccess from "./components/DonationSuccess";
 
 function App() {
   return (
@@ -32,13 +37,14 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/login' element={<LoginPage />} />
         <Route path='/register' element={<Register />} />
+        <Route path='/verify-email' element={<VerifyEmail />} />
+        <Route path='/verification-success' element={<VerificationSuccess />} />
         <Route
           path='/analytics-and-reporting'
           element={<AnalyticsAndReportingPage />}
         />
         <Route path='/campaign-details' element={<CampaignDetailsPage />} />
         <Route path='/create-campaign' element={<CreateCampaignPage />} />
-
         <Route
           path='/engagement-and-communication'
           element={<EngagementAndCommunicationPage />}
@@ -59,6 +65,10 @@ function App() {
         <Route path='/terms-of-service' element={<TermsOfService />} />
         <Route path='/data-protection' element={<DataProtection />} />
         <Route path='/faq' element={<FAQPage />} />
+        <Route path='/campaigns/:campaignId' element={<CampaignPayment />} />
+        <Route path='/donors' element={<DonorsPage />} />
+        <Route path='/donation/success' element={<DonationSuccess />} />
+        ```
       </Routes>
       <AppToaster />
     </Router>

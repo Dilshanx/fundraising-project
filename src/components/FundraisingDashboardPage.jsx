@@ -10,32 +10,28 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "@/components/Footer";
+import apiConfig from "@/config/apiConfig";
 
 const DashboardPage = () => {
   // State to manage dashboard data
-  const [dashboardData, setDashboardData] = useState({
-    totalCampaigns: 3,
-    totalRaised: 62500,
-    activedonors: 124,
-    averageDonation: 504,
-    campaignGoalProgress: 0.625, // 62.5% progress
-    recentDonors: [
-      { name: "John Doe", amount: 1000, date: "2024-02-15" },
-      { name: "Jane Smith", amount: 500, date: "2024-02-14" },
-      { name: "Alex Johnson", amount: 250, date: "2024-02-13" },
-    ],
-  });
+  const [dashboardData, setDashboardData] = useState(null);
 
   // State for loading and error handling
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Simulated data fetching effect
+  // Data fetching effect
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // In a real application, replace this with an actual API call
-        setIsLoading(false);
+        const response = await apiConfig.get("/dashboard");
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+          setIsLoading(false);
+        } else {
+          setError(response.data.message || "Failed to load dashboard data");
+          setIsLoading(false);
+        }
       } catch (err) {
         setError("Failed to load dashboard data");
         setIsLoading(false);
@@ -121,7 +117,7 @@ const DashboardPage = () => {
             </CardHeader>
             <CardContent>
               <div className='text-2xl font-bold'>
-                {dashboardData.activedonors}
+                {dashboardData.activeDonors}
               </div>
             </CardContent>
           </Card>
@@ -162,22 +158,23 @@ const DashboardPage = () => {
               </Link>
             </CardHeader>
             <CardContent>
-              {dashboardData.recentDonors.map((donor, index) => (
-                <div
-                  key={index}
-                  className='flex justify-between items-center py-2 border-b last:border-b-0'
-                >
-                  <div>
-                    <p className='font-medium'>{donor.name}</p>
-                    <p className='text-sm text-muted-foreground'>
-                      {donor.date}
-                    </p>
+              {dashboardData.recentDonors &&
+                dashboardData.recentDonors.map((donor, index) => (
+                  <div
+                    key={index}
+                    className='flex justify-between items-center py-2 border-b last:border-b-0'
+                  >
+                    <div>
+                      <p className='font-medium'>{donor.name}</p>
+                      <p className='text-sm text-muted-foreground'>
+                        {donor.date}
+                      </p>
+                    </div>
+                    <div className='font-bold text-green-600'>
+                      {formatCurrency(donor.amount)}
+                    </div>
                   </div>
-                  <div className='font-bold text-green-600'>
-                    {formatCurrency(donor.amount)}
-                  </div>
-                </div>
-              ))}
+                ))}
             </CardContent>
           </Card>
         </div>
