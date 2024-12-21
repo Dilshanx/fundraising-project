@@ -17,6 +17,8 @@ const HelpSupportPage = () => {
   const [ticketSubject, setTicketSubject] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [ticketEmail, setTicketEmail] = useState("");
+  const [ticketName, setTicketName] = useState("");
 
   const faqCategories = [
     {
@@ -56,19 +58,21 @@ const HelpSupportPage = () => {
     setIsLoading(true);
     try {
       const response = await apiConfig.post("/support/tickets", {
-        subject: ticketSubject,
-        description: ticketDescription,
+        subject: ticketSubject.trim(),
+        description: ticketDescription.trim(),
+        email: ticketEmail.trim(),
+        name: ticketName.trim(),
       });
+
       if (response.data.success) {
-        toast.success(response.data.message);
+        toast.success("Ticket submitted successfully!");
         setTicketSubject("");
         setTicketDescription("");
-      } else {
-        toast.error(response.data.message || "Error submitting ticket.");
+        setTicketEmail("");
+        setTicketName("");
       }
     } catch (error) {
-      toast.error(error.message);
-      console.error("Failed to submit support ticket:", error);
+      toast.error(error.response?.data?.message || "Error submitting ticket");
     } finally {
       setIsLoading(false);
     }
@@ -108,6 +112,30 @@ const HelpSupportPage = () => {
           <form onSubmit={submitSupportTicket} className='space-y-6'>
             <div>
               <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                Name
+              </label>
+              <input
+                type='text'
+                value={ticketName}
+                onChange={(e) => setTicketName(e.target.value)}
+                className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
+                placeholder='Enter your name'
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+                Email
+              </label>
+              <input
+                type='email'
+                value={ticketEmail}
+                onChange={(e) => setTicketEmail(e.target.value)}
+                className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
+                placeholder='Enter your email address'
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
                 Support Ticket Subject
               </label>
               <input
@@ -116,6 +144,7 @@ const HelpSupportPage = () => {
                 onChange={(e) => setTicketSubject(e.target.value)}
                 required
                 className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
+                placeholder='Brief description of your issue'
               />
             </div>
             <div>
@@ -128,6 +157,7 @@ const HelpSupportPage = () => {
                 onChange={(e) => setTicketDescription(e.target.value)}
                 required
                 className='mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-300 dark:text-gray-800 shadow-lg'
+                placeholder='Please provide detailed information about your issue'
               />
             </div>
             <Button type='submit' variant='default' disabled={isLoading}>

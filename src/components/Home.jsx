@@ -143,7 +143,7 @@ const Home = () => {
       icon: ListIcon,
       title: "Campaign Details",
       description: "View specific campaign information",
-      link: "/campaign-details",
+      link: "/explore-campaigns",
     },
     {
       icon: DollarSignIcon,

@@ -166,6 +166,7 @@ const DashboardPage = () => {
                   >
                     <div>
                       <p className='font-medium'>{donor.name}</p>
+
                       <p className='text-sm text-muted-foreground'>
                         {donor.date}
                       </p>

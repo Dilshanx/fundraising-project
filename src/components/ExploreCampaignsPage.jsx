@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { FilterIcon, SearchIcon, CalendarIcon } from "lucide-react";
 import apiConfig from "@/config/apiConfig";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const ExploreCampaigns = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     category: "",
@@ -16,8 +17,7 @@ const ExploreCampaigns = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const [campaigns, setCampaigns] = useState([]); // State to hold fetched campaigns
+  const [campaigns, setCampaigns] = useState([]);
 
   const campaignCategories = [
     "Education",
@@ -28,12 +28,11 @@ const ExploreCampaigns = () => {
     "Humanitarian Aid",
   ];
 
-  // Fetch Campaigns from API on component mount
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
         setIsLoading(true);
-        const response = await apiConfig.get("/campaigns"); // Replace with your actual endpoint
+        const response = await apiConfig.get("/campaigns");
         setCampaigns(response.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -50,6 +49,10 @@ const ExploreCampaigns = () => {
   const filteredCampaigns = campaigns.filter((campaign) =>
     campaign.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleCardClick = (campaignId) => {
+    navigate(`/campaign-details/${campaignId}`);
+  };
 
   return (
     <div className='container mx-auto py-12 px-4'>
@@ -83,7 +86,11 @@ const ExploreCampaigns = () => {
       ) : (
         <div className='grid md:grid-cols-3 gap-6'>
           {filteredCampaigns.map((campaign) => (
-            <Card key={campaign._id} className='hover:shadow-xl transition-all'>
+            <Card
+              key={campaign._id}
+              className='hover:shadow-xl transition-all cursor-pointer'
+              onClick={() => handleCardClick(campaign._id)}
+            >
               <CardContent className='p-6'>
                 <div className='flex justify-between items-center mb-4'>
                   <span className='px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full text-sm'>
@@ -91,7 +98,6 @@ const ExploreCampaigns = () => {
                   </span>
                   <div className='flex items-center text-gray-500'>
                     <CalendarIcon size={16} className='mr-2' />
-                    {/* Convert date to better readable */}
                     {new Date(campaign.endDate).toLocaleDateString()}
                   </div>
                 </div>
@@ -102,7 +108,6 @@ const ExploreCampaigns = () => {
                   <span>
                     Goal: ${campaign.fundraisingGoal.toLocaleString()}
                   </span>
-                  {/*  Calculate amount raised here based on donations */}
                   <span>Raised: $0</span>
                 </div>
 
@@ -114,11 +119,16 @@ const ExploreCampaigns = () => {
                 </div>
                 <div className='flex justify-between text-sm text-gray-600'>
                   <span>0% Funded</span>
-                  <Link to={`/campaigns/${campaign._id}`}>
-                    <Button size='sm' variant='outline'>
-                      Donate Now
-                    </Button>
-                  </Link>
+                  <Button
+                    size='sm'
+                    variant='outline'
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click when clicking button
+                      navigate(`/campaign-details/${campaign._id}`);
+                    }}
+                  >
+                    Donate Now
+                  </Button>
                 </div>
               </CardContent>
             </Card>

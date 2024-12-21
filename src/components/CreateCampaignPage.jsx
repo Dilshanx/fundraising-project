@@ -21,6 +21,7 @@ import {
   HospitalIcon,
   LeafIcon,
   UsersIcon,
+  ImageIcon,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
@@ -35,8 +36,9 @@ const CreateCampaign = () => {
     category: "",
     fundraisingGoal: "",
     endDate: "",
-    imageUrl: "",
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -49,7 +51,6 @@ const CreateCampaign = () => {
     "Humanitarian Aid",
   ];
 
-  // Icon mapping for each category
   const categoryIcons = {
     Education: School2Icon,
     Healthcare: HospitalIcon,
@@ -57,6 +58,15 @@ const CreateCampaign = () => {
     Environmental: LeafIcon,
     "Medical Research": GlobeIcon,
     "Humanitarian Aid": HeartIcon,
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedImage(file);
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -86,22 +96,28 @@ const CreateCampaign = () => {
     }
 
     try {
-      // Prepare the data for submission
-      const submitData = {
-        ...campaignData,
-        fundraisingGoal: parseFloat(campaignData.fundraisingGoal),
-      };
-      console.log("Submit data:", submitData);
+      // Create FormData object
+      const formData = new FormData();
+      formData.append("title", campaignData.title);
+      formData.append("description", campaignData.description);
+      formData.append("category", campaignData.category);
+      formData.append("fundraisingGoal", campaignData.fundraisingGoal);
+      formData.append("endDate", campaignData.endDate);
 
-      // Make API call to create campaign
-      const response = await apiConfig.post("/campaigns", submitData, {
+      if (selectedImage) {
+        formData.append("image", selectedImage);
+      }
+
+      // Make API call to create campaign with FormData
+      const response = await apiConfig.post("/campaigns/form-data", formData, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      // Log the created campaign
       console.log("Campaign created:", response.data);
 
-      // Show a detailed success toast
       toast.success(
         `Campaign "${campaignData.title}" created successfully! 🎉`,
         {
@@ -123,20 +139,17 @@ const CreateCampaign = () => {
         category: "",
         fundraisingGoal: "",
         endDate: "",
-        imageUrl: "",
       });
+      setSelectedImage(null);
+      setPreviewUrl(null);
     } catch (error) {
-      // Handle different types of errors
       console.error("Campaign creation error:", error);
 
       if (error.response) {
-        // Server responded with an error
         setError(error.response.data.message || "Failed to create campaign");
       } else if (error.request) {
-        // Request made but no response received
         setError("No response from server. Please check your connection.");
       } else {
-        // Something else went wrong
         setError(error.message || "An unexpected error occurred");
       }
     } finally {
@@ -149,7 +162,6 @@ const CreateCampaign = () => {
       ...prev,
       [field]: value,
     }));
-    // Clear any existing errors when user starts typing
     if (error) setError(null);
   };
 
@@ -298,18 +310,43 @@ const CreateCampaign = () => {
                   <SelectTrigger>
                     <SelectValue placeholder='Select Campaign Category' />
                   </SelectTrigger>
-                  <SelectContent className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl border boarder-gray-100 ring-1 ring-black ring-opacity-5'>
+                  <SelectContent>
                     {categories.map((category) => {
                       const Icon = categoryIcons[category] || RocketIcon;
                       return (
                         <SelectItem key={category} value={category}>
-                          <Icon className='mr-2 h-4 w-4 inline-block' />
-                          {category}
+                          <div className='flex items-center'>
+                            <Icon className='mr-2' size={16} />
+                            {category}
+                          </div>
                         </SelectItem>
                       );
                     })}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                  <ImageIcon className='inline mr-2' size={16} />
+                  Campaign Image
+                </label>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  onChange={handleImageChange}
+                  disabled={isLoading}
+                  className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+                />
+                {previewUrl && (
+                  <div className='mt-4'>
+                    <img
+                      src={previewUrl}
+                      alt='Preview'
+                      className='w-full max-w-md rounded-lg shadow-md'
+                    />
+                  </div>
+                )}
               </div>
 
               <Button

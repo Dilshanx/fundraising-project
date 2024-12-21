@@ -103,8 +103,8 @@ const CampaignPayment = () => {
         withCredentials: true,
       });
 
-      if (response.status === 200) {
-        window.location.href = response.data;
+      if (response.status === 200 && response?.data?.url) {
+        window.location.href = response.data.url;
       } else {
         throw new Error("Failed to create Stripe session");
       }
