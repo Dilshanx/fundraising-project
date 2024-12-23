@@ -91,6 +91,7 @@ function App() {
 
         {/* User Profile & Settings Routes */}
         <Route path='/user-profile' element={<UserProfilePage />} />
+
         <Route
           path='/security-and-compliance'
           element={<SecurityAndCompliancePage />}
