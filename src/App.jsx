@@ -111,6 +111,7 @@ import Home from "./components/Home";
 import FundraisingDashboardPage from "./components/FundraisingDashboardPage";
 import AnalyticsAndReportingPage from "./components/AnalyticsAndReportingPage";
 import EngagementAndCommunicationPage from "./components/EngagementAndCommunicationPage";
+import AdminDashboard from "./components/AdminDashboard";
 
 // Support & Information Components
 import HelpSupportPage from "./components/HelpSupportPage";
@@ -157,6 +158,8 @@ function App() {
           path='/fundraising-dashboard'
           element={<FundraisingDashboardPage />}
         />
+        <Route path='/admin' element={<AdminDashboard />} />
+
         <Route
           path='/analytics-and-reporting'
           element={<AnalyticsAndReportingPage />}

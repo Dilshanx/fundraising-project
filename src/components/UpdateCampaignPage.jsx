@@ -392,7 +392,10 @@ const UpdateCampaign = () => {
         </form>
 
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <AlertDialogContent>
+          <AlertDialogContent
+            className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+          >
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
               <AlertDialogDescription>

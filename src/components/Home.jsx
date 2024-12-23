@@ -21,6 +21,12 @@ import {
   School2Icon,
   HospitalIcon,
   LeafIcon,
+  BarChart3,
+  Shield,
+  MessageCircle,
+  BookOpen,
+  GanttChart,
+  Receipt,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "./Navbar";
@@ -82,8 +88,51 @@ const Home = () => {
   const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("campaigns");
   const [featuredCampaigns, setFeaturedCampaigns] = useState([]);
-  const [platformFeatures, setPlatformFeatures] = useState([]);
 
+  const platformFeatures = [
+    {
+      icon: GanttChart,
+      title: "Campaign Management",
+      description:
+        "User-friendly campaign creation wizard with customizable templates, goal setting, and real-time progress tracking dashboard.",
+      stats: "Streamlined campaign setup",
+    },
+    {
+      icon: Receipt,
+      title: "Secure Donation Processing",
+      description:
+        "Multiple payment gateways integration with automated receipts and real-time donation tracking across various payment methods.",
+      stats: "Multi-payment support",
+    },
+    {
+      icon: MessageCircle,
+      title: "Engagement Tools",
+      description:
+        "Automated thank-you notes, campaign updates, and messaging system to maintain strong donor relationships.",
+      stats: "Enhanced supporter connection",
+    },
+    {
+      icon: BarChart3,
+      title: "Advanced Analytics",
+      description:
+        "Comprehensive analytics dashboard showing donation trends, donor demographics, and campaign performance metrics.",
+      stats: "Data-driven insights",
+    },
+    {
+      icon: Shield,
+      title: "Security & Compliance",
+      description:
+        "End-to-end encryption, fraud prevention mechanisms, and compliance with data protection regulations.",
+      stats: "Enterprise-grade security",
+    },
+    {
+      icon: BookOpen,
+      title: "User Support",
+      description:
+        "Comprehensive help center with live chat support and ticketing system for immediate assistance.",
+      stats: "24/7 support access",
+    },
+  ];
   // Fetch Featured Campaigns from API
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -106,14 +155,7 @@ const Home = () => {
     "Medical Research": GlobeIcon,
     "Humanitarian Aid": HeartIcon,
   };
-  // const categoryIcons = {
-  //     Education: School2Icon,
-  //     Healthcare: HospitalIcon,
-  //     "Community Development": UsersIcon,
-  //     Environmental: LeafIcon,
-  //     "Medical Research": GlobeIcon,
-  //      "Humanitarian Aid": HeartIcon,
-  // };
+
   const quickAccessLinks = [
     {
       icon: RocketIcon,
@@ -246,83 +288,104 @@ const Home = () => {
             animate='visible'
             className='grid md:grid-cols-3 gap-6'
           >
-            {activeTab === "campaigns" ? (
-              featuredCampaigns.map((campaign, index) => {
-                const Icon = categoryIcons[campaign.category] || HeartIcon;
-                return (
-                  <motion.div key={index} variants={itemVariants}>
-                    <Link to={`/campaigns/${campaign._id}`}>
-                      <Card className='hover:shadow-xl transition-all group bg-white dark:bg-gray-800 border dark:border-gray-700'>
-                        <CardHeader className='flex flex-col items-center space-y-4'>
-                          <div className='flex items-center w-full'>
-                            <Icon
-                              className='text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform'
-                              size={36}
-                            />
-                            <CardTitle className='ml-4 dark:text-white'>
-                              {campaign.title}
-                            </CardTitle>
-                          </div>
-                          {campaign.imageUrl && (
-                            <div className='w-full h-48 rounded-lg overflow-hidden'>
-                              <img
-                                src={campaign.imageUrl}
-                                alt={campaign.title}
-                                className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+            {activeTab === "campaigns"
+              ? featuredCampaigns.map((campaign, index) => {
+                  const Icon = categoryIcons[campaign.category] || HeartIcon;
+                  return (
+                    <motion.div key={index} variants={itemVariants}>
+                      <Link to={`/campaigns/${campaign._id}`}>
+                        <Card className='hover:shadow-xl transition-all group bg-white dark:bg-gray-800 border dark:border-gray-700'>
+                          <CardHeader className='flex flex-col items-center space-y-4'>
+                            <div className='flex items-center w-full'>
+                              <Icon
+                                className='text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform'
+                                size={36}
+                              />
+                              <CardTitle className='ml-4 dark:text-white'>
+                                {campaign.title}
+                              </CardTitle>
+                            </div>
+                            {campaign.imageUrl && (
+                              <div className='w-full h-48 rounded-lg overflow-hidden'>
+                                <img
+                                  src={campaign.imageUrl}
+                                  alt={campaign.title}
+                                  className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+                                />
+                              </div>
+                            )}
+                          </CardHeader>
+                          <CardContent>
+                            <p className='text-gray-600 dark:text-gray-300 mb-4 line-clamp-2'>
+                              {campaign.description}
+                            </p>
+                            <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
+                              <span>
+                                Goal: $
+                                {campaign.fundraisingGoal.toLocaleString()}
+                              </span>
+                              <span>
+                                Raised: $
+                                {(campaign.currentAmount || 0).toLocaleString()}
+                              </span>
+                            </div>
+                            <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
+                              <div
+                                className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
+                                style={{
+                                  width: `${Math.min(
+                                    ((campaign.currentAmount || 0) /
+                                      campaign.fundraisingGoal) *
+                                      100,
+                                    100
+                                  )}%`,
+                                }}
                               />
                             </div>
-                          )}
-                        </CardHeader>
-                        <CardContent>
-                          <p className='text-gray-600 dark:text-gray-300 mb-4 line-clamp-2'>
-                            {campaign.description}
-                          </p>
-                          <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
-                            <span>
-                              Goal: ${campaign.fundraisingGoal.toLocaleString()}
-                            </span>
-                            <span>
-                              Raised: $
-                              {(campaign.currentAmount || 0).toLocaleString()}
-                            </span>
-                          </div>
-                          <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
-                            <div
-                              className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
-                              style={{
-                                width: `${Math.min(
+                            <div className='flex justify-between text-sm text-gray-600 dark:text-gray-400'>
+                              <span>
+                                {Math.round(
                                   ((campaign.currentAmount || 0) /
                                     campaign.fundraisingGoal) *
-                                    100,
-                                  100
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                          <div className='flex justify-between text-sm text-gray-600 dark:text-gray-400'>
-                            <span>
-                              {Math.round(
-                                ((campaign.currentAmount || 0) /
-                                  campaign.fundraisingGoal) *
-                                  100
-                              )}
-                              % Funded
-                            </span>
-                            <span>{campaign.category}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                                    100
+                                )}
+                                % Funded
+                              </span>
+                              <span>{campaign.category}</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </motion.div>
+                  );
+                })
+              : platformFeatures.map((feature, index) => (
+                  <motion.div key={index} variants={itemVariants}>
+                    <Card className='h-full hover:shadow-xl transition-all group bg-white dark:bg-gray-800 border dark:border-gray-700'>
+                      <CardHeader className='flex flex-col items-center space-y-4'>
+                        <div className='w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center'>
+                          <feature.icon
+                            className='text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform'
+                            size={32}
+                          />
+                        </div>
+                        <CardTitle className='text-center dark:text-white'>
+                          {feature.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className='text-center'>
+                        <p className='text-gray-600 dark:text-gray-300 mb-4'>
+                          {feature.description}
+                        </p>
+                        <div className='mt-4 py-2 px-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-full inline-block'>
+                          <span className='text-indigo-600 dark:text-indigo-400 font-semibold'>
+                            {feature.stats}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </motion.div>
-                );
-              })
-            ) : (
-              <div className='text-center col-span-3'>
-                <p className='text-gray-600 dark:text-gray-400'>
-                  Loading platform features...
-                </p>
-              </div>
-            )}
+                ))}
           </motion.div>
         </div>
 

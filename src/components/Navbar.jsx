@@ -246,6 +246,7 @@ import {
   Moon as MoonIcon,
   LogOut as LogOutIcon,
   User as UserIcon,
+  Users as UsersIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -273,7 +274,7 @@ export default function Navbar() {
         });
         if (response.status === 200) {
           setIsLoggedIn(true);
-          setUserData(response.data.user); // Set user data
+          setUserData(response.data.user);
           console.log("User data:", response.data.user);
         }
       } catch (error) {
@@ -294,7 +295,7 @@ export default function Navbar() {
     try {
       await apiConfig.post("/auth/logout", {}, { withCredentials: true });
       setIsLoggedIn(false);
-      setUserData(null); // Clear user data
+      setUserData(null);
       toast.success("Logged out successfully");
       navigate("/login");
     } catch (error) {
@@ -333,6 +334,15 @@ export default function Navbar() {
               <link.Icon size={18} className='mr-2' /> {link.label}
             </Link>
           ))}
+          {/* Admin Dashboard Link (conditionally rendered) */}
+          {isLoggedIn && userData && userData.role === "admin" && (
+            <Link
+              to='/admin'
+              className='text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center transition-colors'
+            >
+              <UsersIcon size={18} className='mr-2' /> Admin Dashboard
+            </Link>
+          )}
         </div>
 
         {/* Theme Toggle and User/Logout Buttons */}
@@ -354,8 +364,6 @@ export default function Navbar() {
                 className='text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center transition-colors'
               >
                 <UserIcon size={20} className='mr-1' />
-
-                {/* Display user's name */}
                 <span className='hidden md:inline'>{userData.name}</span>
               </Link>
 
@@ -419,6 +427,16 @@ export default function Navbar() {
                   <link.Icon size={18} className='mr-2' /> {link.label}
                 </Link>
               ))}
+              {/* Admin Dashboard Link (conditionally rendered) */}
+              {isLoggedIn && userData && userData.role === "admin" && (
+                <Link
+                  to='/admin
+                  '
+                  className='py-2 border-b dark:border-gray-700 text-gray-700 dark:text-gray-300 flex items-center'
+                >
+                  <UsersIcon size={18} className='mr-2' /> Admin Dashboard
+                </Link>
+              )}
               {isLoggedIn && userData ? (
                 <div className='flex items-center space-x-2'>
                   {/* User Profile */}
@@ -427,10 +445,7 @@ export default function Navbar() {
                     className='text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center transition-colors'
                   >
                     <UserIcon size={20} className='mr-1' />
-                    <span className='hidden md:inline'>
-                      {userData.name}
-                    </span>{" "}
-                    {/* Display user's name or email */}
+                    <span className='hidden md:inline'>{userData.name}</span>
                   </Link>
 
                   {/* Logout Button */}
