@@ -253,7 +253,7 @@ const AnalyticsDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Donor Statistics */}
+      {/* Donor Statistics
       <Card>
         <CardHeader>
           <CardTitle>Donor Insights</CardTitle>
@@ -288,7 +288,7 @@ const AnalyticsDashboard = () => {
             <EmptyChart />
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Campaign Category Performance */}
       <Card>

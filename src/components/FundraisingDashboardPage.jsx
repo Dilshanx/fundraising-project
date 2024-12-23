@@ -72,7 +72,7 @@ const DashboardPage = () => {
     <div className='min-h-screen flex flex-col'>
       <Navbar />
 
-      <main className='flex-grow container mx-auto px-4 py-8'>
+      <main className='flex-grow container mx-auto px-4 py-8 my-20'>
         <h1 className='text-3xl font-bold mb-8'>Fundraising Dashboard</h1>
 
         {/* Key Metrics Grid */}
