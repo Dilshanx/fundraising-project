@@ -310,7 +310,10 @@ const CreateCampaign = () => {
                   <SelectTrigger>
                     <SelectValue placeholder='Select Campaign Category' />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent
+                    className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+                  >
                     {categories.map((category) => {
                       const Icon = categoryIcons[category] || RocketIcon;
                       return (

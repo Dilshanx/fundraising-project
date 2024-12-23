@@ -240,7 +240,6 @@ const Home = () => {
               </Button>
             </div>
           </div>
-
           <motion.div
             variants={containerVariants}
             initial='hidden'
@@ -254,31 +253,61 @@ const Home = () => {
                   <motion.div key={index} variants={itemVariants}>
                     <Link to={`/campaigns/${campaign._id}`}>
                       <Card className='hover:shadow-xl transition-all group bg-white dark:bg-gray-800 border dark:border-gray-700'>
-                        <CardHeader className='flex items-center'>
-                          <Icon
-                            className='text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform'
-                            size={36}
-                          />
-                          <CardTitle className='ml-4 dark:text-white'>
-                            {campaign.title}
-                          </CardTitle>
+                        <CardHeader className='flex flex-col items-center space-y-4'>
+                          <div className='flex items-center w-full'>
+                            <Icon
+                              className='text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform'
+                              size={36}
+                            />
+                            <CardTitle className='ml-4 dark:text-white'>
+                              {campaign.title}
+                            </CardTitle>
+                          </div>
+                          {campaign.imageUrl && (
+                            <div className='w-full h-48 rounded-lg overflow-hidden'>
+                              <img
+                                src={campaign.imageUrl}
+                                alt={campaign.title}
+                                className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
+                              />
+                            </div>
+                          )}
                         </CardHeader>
                         <CardContent>
-                          <p className='text-gray-600 dark:text-gray-300 mb-4'>
+                          <p className='text-gray-600 dark:text-gray-300 mb-4 line-clamp-2'>
                             {campaign.description}
                           </p>
                           <div className='flex justify-between mb-2 text-sm text-gray-600 dark:text-gray-400'>
-                            <span>Goal: ${campaign.fundraisingGoal}</span>
-                            <span>Raised: $0</span>
+                            <span>
+                              Goal: ${campaign.fundraisingGoal.toLocaleString()}
+                            </span>
+                            <span>
+                              Raised: $
+                              {(campaign.currentAmount || 0).toLocaleString()}
+                            </span>
                           </div>
                           <div className='w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2'>
                             <div
                               className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
-                              style={{ width: `0%` }}
+                              style={{
+                                width: `${Math.min(
+                                  ((campaign.currentAmount || 0) /
+                                    campaign.fundraisingGoal) *
+                                    100,
+                                  100
+                                )}%`,
+                              }}
                             />
                           </div>
                           <div className='flex justify-between text-sm text-gray-600 dark:text-gray-400'>
-                            <span>0% Funded</span>
+                            <span>
+                              {Math.round(
+                                ((campaign.currentAmount || 0) /
+                                  campaign.fundraisingGoal) *
+                                  100
+                              )}
+                              % Funded
+                            </span>
                             <span>{campaign.category}</span>
                           </div>
                         </CardContent>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,16 +26,40 @@ import {
   LogIn,
   AlertCircle,
   Chrome,
-  Facebook,
   Shield,
   Zap,
+  Facebook,
+  Loader2,
 } from "lucide-react";
 import apiConfig from "@/config/apiConfig";
 
 const LoginPage = () => {
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const login = urlParams.get("login");
+    const userData = urlParams.get("data");
+
+    if (login === "success" && userData) {
+      try {
+        const parsedUserData = JSON.parse(decodeURIComponent(userData));
+        localStorage.setItem("user", JSON.stringify(parsedUserData));
+        window.location.href = "/";
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+        setError("Failed to process login data");
+      }
+    }
+  }, []);
+
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
+  });
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordStatus, setForgotPasswordStatus] = useState({
+    loading: false,
+    message: "",
+    error: false,
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,8 +71,49 @@ const LoginPage = () => {
       ...prev,
       [name]: value,
     }));
-    // Clear any existing errors when user starts typing
     if (error) setError(null);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotPasswordEmail) {
+      setForgotPasswordStatus({
+        loading: false,
+        message: "Please enter your email",
+        error: true,
+      });
+      return;
+    }
+
+    setForgotPasswordStatus({
+      loading: true,
+      message: "",
+      error: false,
+    });
+
+    try {
+      const response = await apiConfig.post("/auth/forgot-password", {
+        email: forgotPasswordEmail,
+      });
+
+      setForgotPasswordStatus({
+        loading: false,
+        message: "Password reset code has been sent to your email",
+        error: false,
+      });
+
+      // Add a small delay before redirecting to ensure the success message is visible
+      setTimeout(() => {
+        window.location.href = `/reset-password?email=${encodeURIComponent(
+          forgotPasswordEmail
+        )}`;
+      }, 1500);
+    } catch (error) {
+      setForgotPasswordStatus({
+        loading: false,
+        message: error.response?.data?.error || "Failed to send reset code",
+        error: true,
+      });
+    }
   };
 
   const handleLocalLogin = async (e) => {
@@ -56,7 +121,6 @@ const LoginPage = () => {
     setIsLoading(true);
     setError(null);
 
-    // Basic client-side validation
     if (!loginData.email || !loginData.password) {
       setError("Please enter both email and password");
       setIsLoading(false);
@@ -71,28 +135,21 @@ const LoginPage = () => {
           password: loginData.password,
         },
         {
-          // Important: Include credentials to allow cookies to be set
           withCredentials: true,
         }
       );
 
-      console.log("Login response:", response.data);
-
-      // Redirect to dashboard
-      window.location.href = "/";
+      if (response.data.success) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Login error:", error);
-
-      // Handle different types of errors
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        setError(error.response.data.error || "Login failed");
+        setError(error.response.data.message || "Login failed");
       } else if (error.request) {
-        // The request was made but no response was received
         setError("No response from server. Please check your connection.");
       } else {
-        // Something happened in setting up the request that triggered an Error
         setError("An error occurred during login");
       }
     } finally {
@@ -100,10 +157,9 @@ const LoginPage = () => {
     }
   };
 
-  const handleSocialLogin = (provider) => {
-    // Redirect to backend social login endpoint
-    // This assumes your backend has corresponding social login routes
-    window.location.href = `${apiConfig.baseURL}/auth/${provider}`;
+  const handleGoogleLogin = () => {
+    const baseURL = "http://localhost:5000/api";
+    window.location.href = `${baseURL}/auth/google`;
   };
 
   return (
@@ -143,7 +199,6 @@ const LoginPage = () => {
           )}
 
           <form onSubmit={handleLocalLogin} className='space-y-4'>
-            {/* Email Input */}
             <div>
               <Label htmlFor='email'>Email Address</Label>
               <Input
@@ -157,7 +212,6 @@ const LoginPage = () => {
               />
             </div>
 
-            {/* Password Input */}
             <div>
               <div className='flex justify-between items-center mb-2'>
                 <Label htmlFor='password'>Password</Label>
@@ -171,19 +225,43 @@ const LoginPage = () => {
                       Forgot password?
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className='bg-white'>
                     <AlertDialogHeader>
                       <AlertDialogTitle>Reset Password</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Enter your email to receive a password reset link
+                        Enter your email to receive a password reset code
                       </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <div className='grid gap-4 py-4'>
-                      <Input placeholder='Enter your email' type='email' />
+                    <div className='space-y-4'>
+                      <Input
+                        placeholder='Enter your email'
+                        type='email'
+                        value={forgotPasswordEmail}
+                        onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                      />
+                      {forgotPasswordStatus.message && (
+                        <div
+                          className={`text-sm ${
+                            forgotPasswordStatus.error
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }`}
+                        >
+                          {forgotPasswordStatus.message}
+                        </div>
+                      )}
                     </div>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction>Send Reset Link</AlertDialogAction>
+                      <AlertDialogAction
+                        onClick={handleForgotPassword}
+                        disabled={forgotPasswordStatus.loading}
+                      >
+                        {forgotPasswordStatus.loading ? (
+                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                        ) : null}
+                        Send Reset Code
+                      </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -209,7 +287,14 @@ const LoginPage = () => {
             </div>
 
             <Button type='submit' className='w-full' disabled={isLoading}>
-              {isLoading ? "Signing In..." : "Sign In"}
+              {isLoading ? (
+                <>
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Signing In...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
 
@@ -218,20 +303,16 @@ const LoginPage = () => {
             <div className='text-center text-sm text-gray-600 mb-4'>
               Or continue with
             </div>
-            <div className='grid grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 gap-4'>
               <Button
                 variant='outline'
-                onClick={() => handleSocialLogin("google")}
+                onClick={handleGoogleLogin}
                 className='w-full'
               >
                 <Chrome className='mr-2 h-5 w-5 text-red-500' />
-                Google
+                Sign in with Google
               </Button>
-              <Button
-                variant='outline'
-                onClick={() => handleSocialLogin("facebook")}
-                className='w-full'
-              >
+              <Button variant='outline' className='w-full'>
                 <Facebook className='mr-2 h-5 w-5 text-blue-600' />
                 Facebook
               </Button>
@@ -239,7 +320,7 @@ const LoginPage = () => {
           </div>
 
           <div className='text-center text-sm text-gray-600 mt-6'>
-            Don't have an account?
+            Don't have an account?{" "}
             <Button
               variant='link'
               size='sm'
