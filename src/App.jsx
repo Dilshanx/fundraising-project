@@ -92,6 +92,7 @@ import Register from "./components/Register";
 import VerifyEmail from "./components/VerifyEmail";
 import VerificationSuccess from "./components/VerificationSuccess";
 import UserProfilePage from "./components/UserProfilePage";
+import ResetPasswordPage from "./components/PasswordResetConfirmationPage";
 
 // Campaign Management Components
 import CreateCampaignPage from "./components/CreateCampaignPage";
@@ -137,6 +138,7 @@ function App() {
         <Route path='/register' element={<Register />} />
         <Route path='/verify-email' element={<VerifyEmail />} />
         <Route path='/verification-success' element={<VerificationSuccess />} />
+        <Route path='/reset-password' element={<ResetPasswordPage />} />
 
         {/* Campaign Management Routes */}
         <Route path='/create-campaign' element={<CreateCampaignPage />} />
