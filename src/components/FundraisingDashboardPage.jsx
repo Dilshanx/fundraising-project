@@ -25,6 +25,7 @@ const DashboardPage = () => {
     const fetchDashboardData = async () => {
       try {
         const response = await apiConfig.get("/dashboard");
+        console.log(response.data);
         if (response.data.success) {
           setDashboardData(response.data.data);
           setIsLoading(false);
@@ -171,9 +172,9 @@ const DashboardPage = () => {
                         {donor.date}
                       </p>
                     </div>
-                    <div className='font-bold text-green-600'>
+                    {/* <div className='font-bold text-green-600'>
                       {formatCurrency(donor.amount)}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
             </CardContent>

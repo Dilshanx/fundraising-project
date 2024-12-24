@@ -82,9 +82,12 @@ const UserProfilePage = () => {
     e.preventDefault();
     setError(null);
     try {
-      const response = await apiConfig.patch(`/user-profile/${user._id}`, {
-        demographicData: formData,
-      });
+      const response = await apiConfig.patch(
+        `/users/user-profile/${user._id}`,
+        {
+          demographicData: formData,
+        }
+      );
 
       setUser((prevUser) => ({
         ...prevUser,
@@ -101,7 +104,7 @@ const UserProfilePage = () => {
   const handleClearProfile = async () => {
     setError(null);
     try {
-      await apiConfig.delete(`/user-profile/${user._id}`);
+      await apiConfig.delete(`/users/user-profile/${user._id}`);
       setUser((prevUser) => ({
         ...prevUser,
         demographicData: {},
@@ -128,11 +131,17 @@ const UserProfilePage = () => {
     },
     {
       icon: Globe,
+      label: "City",
+      value: user.demographicData?.city
+        ? `${user.demographicData.city}`
+        : "Not specified",
+    },
+    {
+      icon: Globe,
       label: "Location",
-      value:
-        user.demographicData?.city && user.demographicData?.country
-          ? `${user.demographicData.city}, ${user.demographicData.country}`
-          : "Not specified",
+      value: user.demographicData?.country
+        ? `${user.demographicData.country}`
+        : "Not specified",
     },
   ];
 
@@ -239,6 +248,18 @@ const UserProfilePage = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label htmlFor='city'>City</Label>
+                      <Input
+                        id='city'
+                        value={formData.city || ""}
+                        onChange={(e) =>
+                          handleInputChange("city", e.target.value)
+                        }
+                        className='w-full'
+                      />
                     </div>
 
                     <div className='space-y-2'>
