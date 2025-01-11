@@ -368,7 +368,10 @@ const UserProfilePage = () => {
                           Clear Profile
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent
+                        className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                    border border-gray-100 ring-1 ring-black ring-opacity-5'
+                      >
                         <AlertDialogHeader>
                           <AlertDialogTitle>
                             Clear Profile Data?
@@ -395,13 +398,16 @@ const UserProfilePage = () => {
                       <AlertDialogTrigger asChild>
                         <Button
                           variant='destructive'
-                          className='w-full sm:w-auto'
+                          className='w-full sm:w-auto '
                         >
                           <Trash2 className='mr-2 h-4 w-4' />
                           Delete Account
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent
+                        className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                    border border-gray-100 ring-1 ring-black ring-opacity-5'
+                      >
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete Account?</AlertDialogTitle>
                           <AlertDialogDescription>
