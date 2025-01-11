@@ -193,7 +193,18 @@ const UpdateCampaign = () => {
       navigate("/explore-campaigns");
     } catch (error) {
       console.error("Campaign deletion error:", error);
-      toast.error("Failed to delete campaign");
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete campaign";
+      toast.error(errorMessage, {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#f44336",
+          color: "white",
+          padding: "16px",
+          borderRadius: "8px",
+        },
+      });
     } finally {
       setIsLoading(false);
       setShowDeleteDialog(false);

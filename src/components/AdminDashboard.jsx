@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import MyCampaigns from "@/components/MyCampaigns";
 
 // Create axios instance with auth interceptor
 const apiConfig = axios.create({
@@ -185,6 +186,7 @@ const AdminDashboard = () => {
 
   return (
     <div className='container mx-auto p-6'>
+      <MyCampaigns />
       <Card>
         <CardHeader>
           <CardTitle className='text-2xl'>User Management</CardTitle>

@@ -22,6 +22,7 @@ import {
   Calendar,
   Globe,
   Trash2,
+  Flag,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -36,6 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Navbar from "./Navbar";
 import Footer from "@/components/Footer";
+import MyCampaigns from "@/components/MyCampaigns";
 import apiConfig from "@/config/apiConfig";
 
 const UserProfilePage = () => {
@@ -433,6 +435,17 @@ const UserProfilePage = () => {
           </motion.div>
         );
 
+      case "campaigns":
+        return (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className='space-y-8'
+          >
+            <MyCampaigns />
+          </motion.div>
+        );
+
       case "settings":
         return (
           <div className='space-y-6'>
@@ -491,6 +504,14 @@ const UserProfilePage = () => {
                   className='w-full justify-start'
                 >
                   <User className='mr-2' size={20} /> Profile
+                </Button>
+
+                <Button
+                  variant={activeTab === "campaigns" ? "default" : "ghost"}
+                  onClick={() => setActiveTab("campaigns")}
+                  className='w-full justify-start'
+                >
+                  <Flag className='mr-2' size={20} /> Campaigns
                 </Button>
 
                 <Button

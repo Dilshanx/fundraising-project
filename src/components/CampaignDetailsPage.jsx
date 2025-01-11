@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import apiConfig from "@/config/apiConfig";
 import UpdateCampaign from "./UpdateCampaignPage";
+import CampaignDonors from "./CampaignDonors";
 
 const CampaignDetails = () => {
   const { id } = useParams();
@@ -160,16 +161,6 @@ const CampaignDetails = () => {
                   </p>
                 </div>
 
-                <div className='bg-purple-50 p-4 rounded-lg'>
-                  <div className='flex items-center mb-2'>
-                    <UsersIcon className='mr-2 text-purple-600' size={24} />
-                    <span className='font-semibold'>Total Supporters</span>
-                  </div>
-                  <p className='text-2xl font-bold'>
-                    {campaign.supportersCount || 0}
-                  </p>
-                </div>
-
                 <div className='bg-green-50 p-4 rounded-lg'>
                   <div className='flex items-center mb-2'>
                     <ShareIcon className='mr-2 text-green-600' size={24} />
@@ -260,30 +251,7 @@ const CampaignDetails = () => {
                   <h3 className='text-xl font-semibold mb-4'>
                     Campaign Supporters
                   </h3>
-                  {campaign.supporters && campaign.supporters.length > 0 ? (
-                    <div className='space-y-4'>
-                      {campaign.supporters.map((supporter, index) => (
-                        <div
-                          key={index}
-                          className='flex items-center space-x-4'
-                        >
-                          <UsersIcon className='text-purple-600' size={20} />
-                          <div>
-                            <p className='font-medium'>
-                              {supporter.name || "Anonymous"}
-                            </p>
-                            <p className='text-sm text-gray-500'>
-                              Donated: ${supporter.amount?.toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className='text-gray-500'>
-                      Be the first to support this campaign!
-                    </p>
-                  )}
+                  <CampaignDonors campaignId={id} />
                 </div>
               )}
             </CardContent>
@@ -310,10 +278,7 @@ const CampaignDetails = () => {
                     {(campaign.currentAmount || 0).toLocaleString()}
                   </span>
                 </li>
-                <li className='flex items-center'>
-                  <UsersIcon className='mr-2 text-purple-600' size={20} />
-                  <span>Total Supporters: {campaign.supportersCount || 0}</span>
-                </li>
+
                 <li className='flex items-center'>
                   <ShareIcon className='mr-2 text-indigo-600' size={20} />
                   <span>Campaign Progress: {progress}%</span>

@@ -27,9 +27,11 @@ import { toast } from "react-hot-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import apiConfig from "@/config/apiConfig";
 
 const CreateCampaign = () => {
+  const navigate = useNavigate();
   const [campaignData, setCampaignData] = useState({
     title: "",
     description: "",
@@ -60,9 +62,54 @@ const CreateCampaign = () => {
     "Humanitarian Aid": HeartIcon,
   };
 
+  const validateForm = () => {
+    if (campaignData.title.length < 5) {
+      setError("Campaign title must be at least 5 characters long");
+      return false;
+    }
+
+    if (!campaignData.description || campaignData.description.length < 20) {
+      setError(
+        "Please provide a detailed description (at least 20 characters)"
+      );
+      return false;
+    }
+
+    if (!campaignData.category) {
+      setError("Please select a campaign category");
+      return false;
+    }
+
+    if (parseFloat(campaignData.fundraisingGoal) < 100) {
+      setError("Fundraising goal must be at least $100");
+      return false;
+    }
+
+    const endDate = new Date(campaignData.endDate);
+    const today = new Date();
+    if (endDate <= today) {
+      setError("Campaign end date must be in the future");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (e.g., max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload only image files");
+        return;
+      }
+
       setSelectedImage(file);
       const fileUrl = URL.createObjectURL(file);
       setPreviewUrl(fileUrl);
@@ -74,34 +121,18 @@ const CreateCampaign = () => {
     setIsLoading(true);
     setError(null);
 
-    // Validation logic remains the same
-    if (campaignData.title.length < 5) {
-      setError("Campaign title must be at least 5 characters long");
-      setIsLoading(false);
-      return;
-    }
-
-    if (parseFloat(campaignData.fundraisingGoal) < 100) {
-      setError("Fundraising goal must be at least $100");
-      setIsLoading(false);
-      return;
-    }
-
-    const endDate = new Date(campaignData.endDate);
-    const today = new Date();
-    if (endDate <= today) {
-      setError("Campaign end date must be in the future");
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append("title", campaignData.title);
-      formData.append("description", campaignData.description);
-      formData.append("category", campaignData.category);
-      formData.append("fundraisingGoal", campaignData.fundraisingGoal);
-      formData.append("endDate", campaignData.endDate);
+      Object.keys(campaignData).forEach((key) => {
+        if (campaignData[key]) {
+          formData.append(key, campaignData[key]);
+        }
+      });
 
       if (selectedImage) {
         formData.append("image", selectedImage);
@@ -114,39 +145,33 @@ const CreateCampaign = () => {
         },
       });
 
-      toast.success(
-        `Campaign "${campaignData.title}" created successfully! 🎉`,
-        {
-          duration: 4000,
-          position: "top-right",
-          style: {
-            background: "#4caf50",
-            color: "white",
-            padding: "16px",
-            borderRadius: "8px",
-          },
-        }
-      );
-
-      // Reset form
-      setCampaignData({
-        title: "",
-        description: "",
-        category: "",
-        fundraisingGoal: "",
-        endDate: "",
+      toast.success("Campaign created successfully! 🎉", {
+        duration: 4000,
+        position: "top-right",
+        style: {
+          background: "#4caf50",
+          color: "white",
+          padding: "16px",
+          borderRadius: "8px",
+        },
       });
-      setSelectedImage(null);
-      setPreviewUrl(null);
+
+      // Navigate to the new campaign page
+      navigate(`/campaigns/${response.data.data._id}`);
     } catch (error) {
       console.error("Campaign creation error:", error);
-      if (error.response) {
-        setError(error.response.data.message || "Failed to create campaign");
-      } else if (error.request) {
-        setError("No response from server. Please check your connection.");
-      } else {
-        setError(error.message || "An unexpected error occurred");
-      }
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to create campaign";
+
+      setError(errorMessage);
+
+      toast.error(errorMessage, {
+        duration: 4000,
+        position: "top-right",
+      });
     } finally {
       setIsLoading(false);
     }
