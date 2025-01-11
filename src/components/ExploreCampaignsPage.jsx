@@ -108,17 +108,33 @@ const ExploreCampaigns = () => {
                   <span>
                     Goal: ${campaign.fundraisingGoal.toLocaleString()}
                   </span>
-                  <span>Raised: $0</span>
+                  <span>
+                    Raised: ${(campaign.currentAmount || 0).toLocaleString()}
+                  </span>
                 </div>
 
                 <div className='w-full bg-gray-200 rounded-full h-2.5 mb-2'>
                   <div
-                    className='bg-gradient-to-r from-indigo-600 to-purple-600 h-2.5 rounded-full'
-                    style={{ width: `0%` }}
+                    className='bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 h-2.5 rounded-full'
+                    style={{
+                      width: `${Math.min(
+                        ((campaign.currentAmount || 0) /
+                          campaign.fundraisingGoal) *
+                          100,
+                        100
+                      )}%`,
+                    }}
                   />
                 </div>
                 <div className='flex justify-between text-sm text-gray-600'>
-                  <span>0% Funded</span>
+                  <span>
+                    {Math.round(
+                      ((campaign.currentAmount || 0) /
+                        campaign.fundraisingGoal) *
+                        100
+                    )}
+                    % Funded
+                  </span>
                   <Button
                     size='sm'
                     variant='outline'

@@ -74,7 +74,7 @@ const CreateCampaign = () => {
     setIsLoading(true);
     setError(null);
 
-    // Validation
+    // Validation logic remains the same
     if (campaignData.title.length < 5) {
       setError("Campaign title must be at least 5 characters long");
       setIsLoading(false);
@@ -96,7 +96,6 @@ const CreateCampaign = () => {
     }
 
     try {
-      // Create FormData object
       const formData = new FormData();
       formData.append("title", campaignData.title);
       formData.append("description", campaignData.description);
@@ -108,15 +107,12 @@ const CreateCampaign = () => {
         formData.append("image", selectedImage);
       }
 
-      // Make API call to create campaign with FormData
       const response = await apiConfig.post("/campaigns/form-data", formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log("Campaign created:", response.data);
 
       toast.success(
         `Campaign "${campaignData.title}" created successfully! 🎉`,
@@ -144,7 +140,6 @@ const CreateCampaign = () => {
       setPreviewUrl(null);
     } catch (error) {
       console.error("Campaign creation error:", error);
-
       if (error.response) {
         setError(error.response.data.message || "Failed to create campaign");
       } else if (error.request) {
@@ -168,7 +163,7 @@ const CreateCampaign = () => {
   const SelectedIcon = categoryIcons[campaignData.category] || RocketIcon;
 
   return (
-    <div className='flex flex-col min-h-screen'>
+    <div className='flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800'>
       <Navbar />
 
       <motion.main
@@ -177,7 +172,7 @@ const CreateCampaign = () => {
         transition={{ duration: 0.5 }}
         className='container mx-auto py-12 px-4 flex-grow'
       >
-        <Card className='max-w-2xl mt-10 mx-auto bg-white dark:bg-gray-800'>
+        <Card className='max-w-2xl mt-10 mx-auto bg-white/80 backdrop-blur-sm dark:bg-gray-800/80 shadow-xl border-0'>
           <CardHeader>
             <CardTitle className='flex items-center text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
               <SelectedIcon className='mr-3' size={32} />
@@ -192,16 +187,19 @@ const CreateCampaign = () => {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className='bg-red-50 border border-red-200 p-3 rounded-lg flex items-center mb-4'
+                className='bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 p-3 rounded-lg flex items-center mb-4'
               >
-                <AlertCircle className='mr-2 text-red-500' size={20} />
-                <span className='text-red-700'>{error}</span>
+                <AlertCircle
+                  className='mr-2 text-red-500 dark:text-red-400'
+                  size={20}
+                />
+                <span className='text-red-700 dark:text-red-300'>{error}</span>
               </motion.div>
             )}
 
             <form onSubmit={handleSubmit} className='space-y-6'>
               <div>
-                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                <label className='block mb-2 text-gray-700 dark:text-gray-200'>
                   Campaign Title
                 </label>
                 <Input
@@ -210,21 +208,21 @@ const CreateCampaign = () => {
                   onChange={(e) => handleInputChange("title", e.target.value)}
                   required
                   disabled={isLoading}
-                  className={
+                  className={`bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
                     error && campaignData.title.length < 5
                       ? "border-red-500"
-                      : ""
-                  }
+                      : "border-gray-200 dark:border-gray-700"
+                  }`}
                 />
                 {error && campaignData.title.length < 5 && (
-                  <p className='text-red-500 text-sm mt-1'>
+                  <p className='text-red-500 dark:text-red-400 text-sm mt-1'>
                     Campaign title must be at least 5 characters long
                   </p>
                 )}
               </div>
 
               <div>
-                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                <label className='block mb-2 text-gray-700 dark:text-gray-200'>
                   Description
                 </label>
                 <Textarea
@@ -236,12 +234,13 @@ const CreateCampaign = () => {
                   rows={4}
                   required
                   disabled={isLoading}
+                  className='bg-white/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400'
                 />
               </div>
 
               <div className='grid md:grid-cols-2 gap-4'>
                 <div>
-                  <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                  <label className='block mb-2 text-gray-700 dark:text-gray-200'>
                     <DollarSignIcon className='inline mr-2' size={16} />
                     Fundraising Goal
                   </label>
@@ -255,22 +254,20 @@ const CreateCampaign = () => {
                     required
                     disabled={isLoading}
                     min={100}
-                    className={
+                    className={`bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
                       error && parseFloat(campaignData.fundraisingGoal) < 100
                         ? "border-red-500"
-                        : ""
-                    }
+                        : "border-gray-200 dark:border-gray-700"
+                    }`}
                   />
-                  {error && parseFloat(campaignData.fundraisingGoal) < 100 && (
-                    <p className='text-red-500 text-sm mt-1'>
-                      Fundraising goal must be at least $100
-                    </p>
-                  )}
                 </div>
 
                 <div>
-                  <label className='block mb-2 text-gray-700 dark:text-gray-300'>
-                    <CalendarIcon className='inline mr-2' size={16} />
+                  <label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                    <CalendarIcon
+                      className='inline mr-2 text-gray-600 dark:text-gray-300'
+                      size={16}
+                    />
                     Campaign End Date
                   </label>
                   <Input
@@ -282,22 +279,17 @@ const CreateCampaign = () => {
                     required
                     disabled={isLoading}
                     min={new Date().toISOString().split("T")[0]}
-                    className={
+                    className={`bg-white/50 dark:bg-gray-900/50 text-gray-900 dark:text-gray-100 ${
                       error && new Date(campaignData.endDate) <= new Date()
                         ? "border-red-500"
-                        : ""
-                    }
+                        : "border-gray-200 dark:border-gray-700"
+                    }`}
                   />
-                  {error && new Date(campaignData.endDate) <= new Date() && (
-                    <p className='text-red-500 text-sm mt-1'>
-                      Campaign end date must be in the future
-                    </p>
-                  )}
                 </div>
               </div>
 
               <div>
-                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                <label className='block mb-2 text-gray-700 dark:text-gray-200'>
                   Campaign Category
                 </label>
                 <Select
@@ -307,13 +299,10 @@ const CreateCampaign = () => {
                   }
                   disabled={isLoading}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className='bg-white/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100'>
                     <SelectValue placeholder='Select Campaign Category' />
                   </SelectTrigger>
-                  <SelectContent
-                    className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
-                 border border-gray-100 ring-1 ring-black ring-opacity-5'
-                  >
+                  <SelectContent className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'>
                     {categories.map((category) => {
                       const Icon = categoryIcons[category] || RocketIcon;
                       return (
@@ -330,7 +319,7 @@ const CreateCampaign = () => {
               </div>
 
               <div>
-                <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+                <label className='block mb-2 text-gray-700 dark:text-gray-200'>
                   <ImageIcon className='inline mr-2' size={16} />
                   Campaign Image
                 </label>
@@ -339,7 +328,11 @@ const CreateCampaign = () => {
                   accept='image/*'
                   onChange={handleImageChange}
                   disabled={isLoading}
-                  className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+                  className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 
+                           file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 
+                           hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300
+                           dark:hover:file:bg-indigo-800 bg-white/50 dark:bg-gray-900/50 
+                           border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100'
                 />
                 {previewUrl && (
                   <div className='mt-4'>
@@ -354,7 +347,9 @@ const CreateCampaign = () => {
 
               <Button
                 type='submit'
-                className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+                className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 
+                         hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 
+                         dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600'
                 disabled={isLoading}
               >
                 {isLoading ? "Creating Campaign..." : "Create Campaign"}

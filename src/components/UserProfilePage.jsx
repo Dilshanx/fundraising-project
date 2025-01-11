@@ -71,6 +71,21 @@ const UserProfilePage = () => {
     fetchUserData();
   }, []);
 
+  const handleDeleteAccount = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await apiConfig.delete(`/users/${user._id}`);
+      // Redirect to logout or home page after successful deletion
+      window.location.href = "/logout";
+    } catch (err) {
+      console.error("Failed to delete account:", err);
+      setError("Failed to delete account. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -103,19 +118,30 @@ const UserProfilePage = () => {
 
   const handleClearProfile = async () => {
     setError(null);
+    setLoading(true);
     try {
       await apiConfig.delete(`/users/user-profile/${user._id}`);
       setUser((prevUser) => ({
         ...prevUser,
-        demographicData: {},
+        demographicData: {
+          ageRange: null,
+          gender: null,
+          country: null,
+          state: null,
+          city: null,
+          interests: [],
+        },
       }));
       setFormData({});
+      // Show success message
+      setSuccess("Profile data cleared successfully");
     } catch (err) {
       console.error("Failed to clear profile:", err);
       setError("Failed to clear profile data. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   };
-
   const profileSections = [
     { icon: Mail, label: "Email", value: user.email },
     { icon: Phone, label: "Phone", value: user.phone || "Not specified" },
@@ -211,7 +237,10 @@ const UserProfilePage = () => {
                         <SelectTrigger>
                           <SelectValue placeholder='Select age range' />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                          className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+                        >
                           {["18-24", "25-34", "35-44", "45-54", "55+"].map(
                             (age) => (
                               <SelectItem key={age} value={age}>
@@ -234,7 +263,10 @@ const UserProfilePage = () => {
                         <SelectTrigger>
                           <SelectValue placeholder='Select gender' />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent
+                          className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+                        >
                           {[
                             "Male",
                             "Female",
@@ -342,8 +374,9 @@ const UserProfilePage = () => {
                             Clear Profile Data?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
-                            This action will remove all your demographic
-                            information. This action cannot be undone.
+                            This will remove all your demographic information
+                            including age range, gender, location, and
+                            interests. This action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -353,6 +386,36 @@ const UserProfilePage = () => {
                             className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
                           >
                             Clear Data
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant='destructive'
+                          className='w-full sm:w-auto'
+                        >
+                          <Trash2 className='mr-2 h-4 w-4' />
+                          Delete Account
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Account?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete your account and all
+                            associated data. This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDeleteAccount}
+                            className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                          >
+                            Delete Account
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

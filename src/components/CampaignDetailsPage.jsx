@@ -33,6 +33,7 @@ const CampaignDetails = () => {
         console.log("Fetching campaign with ID:", id);
         setIsLoading(true);
         const response = await apiConfig.get(`/campaigns/${id}`);
+        console.log(response);
 
         if (response.data.success) {
           setCampaign(response.data.data);
@@ -97,7 +98,7 @@ const CampaignDetails = () => {
   const progress =
     campaign.fundraisingGoal > 0
       ? Math.round(
-          ((campaign.amountRaised || 0) / campaign.fundraisingGoal) * 100
+          ((campaign.currentAmount || 0) / campaign.fundraisingGoal) * 100
         )
       : 0;
 
@@ -306,7 +307,7 @@ const CampaignDetails = () => {
                   <DollarSignIcon className='mr-2 text-green-600' size={20} />
                   <span>
                     Total Raised: $
-                    {(campaign.amountRaised || 0).toLocaleString()}
+                    {(campaign.currentAmount || 0).toLocaleString()}
                   </span>
                 </li>
                 <li className='flex items-center'>

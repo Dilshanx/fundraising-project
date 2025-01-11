@@ -7,14 +7,13 @@ import apiConfig from "@/config/apiConfig";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 
-// Updated API configuration with credentials
+// API configuration remains the same
 const secureApiConfig = {
   ...apiConfig,
   withCredentials: true,
   headers: {
     ...apiConfig.headers,
     "Content-Type": "application/json",
-    // Ensure CSRF token is included if your backend requires it
     ...(typeof window !== "undefined" && {
       "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')
         ?.content,
@@ -29,12 +28,14 @@ const Comments = ({ campaignId, currentUser }) => {
   const [editingComment, setEditingComment] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Existing useEffect and fetch functions remain the same...
   useEffect(() => {
     if (campaignId) {
       fetchComments();
     }
   }, [campaignId]);
 
+  // All existing handler functions remain the same...
   const fetchComments = async () => {
     try {
       const response = await secureApiConfig.get(
@@ -129,19 +130,20 @@ const Comments = ({ campaignId, currentUser }) => {
     }
   };
 
-  // Rest of the component remains the same...
   const Comment = ({ comment, isReply }) => (
     <div className={`flex gap-4 ${isReply ? "ml-12 mt-4" : "mt-6"}`}>
       <Avatar className='h-10 w-10'>
-        <div className='bg-indigo-500 text-white w-full h-full flex items-center justify-center rounded-full'>
+        <div className='bg-indigo-500 dark:bg-indigo-600 text-white w-full h-full flex items-center justify-center rounded-full'>
           {comment.userId.name[0].toUpperCase()}
         </div>
       </Avatar>
       <div className='flex-1'>
-        <div className='bg-gray-50 dark:bg-gray-800 rounded-lg p-4'>
+        <div className='bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 shadow-sm dark:shadow-gray-900/20'>
           <div className='flex justify-between items-start'>
             <div>
-              <h4 className='font-semibold'>{comment.userId.name}</h4>
+              <h4 className='font-semibold text-gray-900 dark:text-gray-100'>
+                {comment.userId.name}
+              </h4>
               <p className='text-sm text-gray-500 dark:text-gray-400'>
                 {format(new Date(comment.createdAt), "MMM d, yyyy")}
               </p>
@@ -153,16 +155,18 @@ const Comments = ({ campaignId, currentUser }) => {
                   <Button
                     variant='ghost'
                     size='icon'
+                    className='hover:bg-gray-200 dark:hover:bg-gray-700'
                     onClick={() => setEditingComment(comment._id)}
                   >
-                    <Edit2 className='h-4 w-4' />
+                    <Edit2 className='h-4 w-4 text-gray-600 dark:text-gray-400' />
                   </Button>
                   <Button
                     variant='ghost'
                     size='icon'
+                    className='hover:bg-gray-200 dark:hover:bg-gray-700'
                     onClick={() => handleDeleteComment(comment._id)}
                   >
-                    <Trash2 className='h-4 w-4' />
+                    <Trash2 className='h-4 w-4 text-gray-600 dark:text-gray-400' />
                   </Button>
                 </div>
               )}
@@ -172,25 +176,34 @@ const Comments = ({ campaignId, currentUser }) => {
               <Textarea
                 defaultValue={comment.comment}
                 onChange={(e) => setEditingComment(e.target.value)}
-                className='min-h-[100px]'
+                className='min-h-[100px] bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600'
               />
               <div className='flex gap-2 mt-2'>
-                <Button onClick={() => handleUpdateComment(comment._id)}>
+                <Button
+                  onClick={() => handleUpdateComment(comment._id)}
+                  className='bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600'
+                >
                   Save
                 </Button>
-                <Button variant='ghost' onClick={() => setEditingComment(null)}>
+                <Button
+                  variant='ghost'
+                  onClick={() => setEditingComment(null)}
+                  className='hover:bg-gray-200 dark:hover:bg-gray-700'
+                >
                   Cancel
                 </Button>
               </div>
             </div>
           ) : (
             <>
-              <p className='mt-2'>{comment.comment}</p>
+              <p className='mt-2 text-gray-800 dark:text-gray-200'>
+                {comment.comment}
+              </p>
               {!isReply && (
                 <Button
                   variant='ghost'
                   size='sm'
-                  className='mt-2'
+                  className='mt-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   onClick={() => setReplyTo(comment._id)}
                 >
                   <Reply className='h-4 w-4 mr-2' />
@@ -210,8 +223,10 @@ const Comments = ({ campaignId, currentUser }) => {
   return (
     <div className='mt-8'>
       <div className='flex items-center gap-2 mb-6'>
-        <MessageSquare className='h-6 w-6' />
-        <h3 className='text-xl font-semibold'>Comments</h3>
+        <MessageSquare className='h-6 w-6 text-gray-700 dark:text-gray-300' />
+        <h3 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>
+          Comments
+        </h3>
       </div>
 
       {currentUser ? (
@@ -220,15 +235,23 @@ const Comments = ({ campaignId, currentUser }) => {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder={replyTo ? "Write a reply..." : "Write a comment..."}
-            className='min-h-[100px]'
+            className='min-h-[100px] bg-white dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400'
           />
           <div className='flex justify-end gap-2 mt-2'>
             {replyTo && (
-              <Button variant='ghost' onClick={() => setReplyTo(null)}>
+              <Button
+                variant='ghost'
+                onClick={() => setReplyTo(null)}
+                className='hover:bg-gray-200 dark:hover:bg-gray-700'
+              >
                 Cancel Reply
               </Button>
             )}
-            <Button type='submit' disabled={isLoading}>
+            <Button
+              type='submit'
+              disabled={isLoading}
+              className='bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600'
+            >
               {isLoading ? "Posting..." : "Post Comment"}
             </Button>
           </div>

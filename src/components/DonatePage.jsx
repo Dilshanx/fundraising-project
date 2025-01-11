@@ -534,7 +534,9 @@ const DonatePage = () => {
 
             {/* Payment Method Selection */}
             <div className='mb-6'>
-              <Label className='block mb-2'>Select Payment Method</Label>
+              <Label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                Select Payment Method
+              </Label>
               <div className='flex gap-4'>
                 <button
                   onClick={() => handlePaymentMethodChange("stripe")}
@@ -542,8 +544,8 @@ const DonatePage = () => {
                     flex items-center px-4 py-2 rounded-lg border transition-all
                     ${
                       paymentMethod === "stripe"
-                        ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30"
-                        : "border-gray-200 dark:border-gray-700"
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/30 dark:text-indigo-300"
+                        : "border-gray-200 dark:border-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }
                   `}
                 >
@@ -556,8 +558,8 @@ const DonatePage = () => {
                     flex items-center px-4 py-2 rounded-lg border transition-all
                     ${
                       paymentMethod === "paypal"
-                        ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30"
-                        : "border-gray-200 dark:border-gray-700"
+                        ? "border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/30 dark:text-indigo-300"
+                        : "border-gray-200 dark:border-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                     }
                   `}
                 >
@@ -586,12 +588,16 @@ const DonatePage = () => {
               <>
                 {/* Campaign Selection */}
                 <div className='mb-6'>
-                  <Label className='block mb-2'>Select Campaign</Label>
+                  <Label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                    Select Campaign
+                  </Label>
                   <div className='grid md:grid-cols-3 gap-4'>
                     {isLoading ? (
-                      <p>Loading Campaigns</p>
+                      <p className='text-gray-600 dark:text-gray-400'>
+                        Loading Campaigns...
+                      </p>
                     ) : error ? (
-                      <p>{error}</p>
+                      <p className='text-red-600 dark:text-red-400'>{error}</p>
                     ) : (
                       featuredCampaigns.map((campaign) => {
                         const Icon =
@@ -601,18 +607,18 @@ const DonatePage = () => {
                             key={campaign._id}
                             onClick={() => setSelectedCampaignId(campaign._id)}
                             className={`
-                              p-4 rounded-xl border transition-all 
+                              p-4 rounded-xl border transition-all
                               ${
                                 selectedCampaignId === campaign._id
-                                  ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30"
-                                  : "border-gray-200 dark:border-gray-700"
+                                  ? "border-indigo-600 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-900/30"
+                                  : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
                               }
                             `}
                           >
                             <Icon
                               className={`mx-auto mb-2 ${
                                 selectedCampaignId === campaign._id
-                                  ? "text-indigo-600"
+                                  ? "text-indigo-600 dark:text-indigo-400"
                                   : "text-gray-500 dark:text-gray-400"
                               }`}
                               size={36}
@@ -633,97 +639,100 @@ const DonatePage = () => {
                   </div>
                 </div>
 
-                {/* Stripe Form Fields */}
-                <div className='space-y-6'>
-                  {/* Donation Amount Selection */}
-                  <div className='mb-6'>
-                    <Label className='block mb-2'>Donation Amount</Label>
-                    <div className='flex flex-wrap gap-3 mb-4'>
-                      {donationPresets.map((amount) => (
-                        <button
-                          key={amount}
-                          onClick={() => handleDonationAmountSelect(amount)}
-                          className={`
-                            px-4 py-2 rounded-full border transition-all
-                            ${
-                              donationAmount == amount
-                                ? "bg-indigo-600 text-white"
-                                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100"
-                            }
-                          `}
-                        >
-                          ${amount}
-                        </button>
-                      ))}
-                    </div>
-                    <div className='flex items-center'>
-                      <div className='relative flex-grow'>
-                        <DollarSignIcon
-                          className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
-                          size={20}
-                        />
-                        <Input
-                          type='number'
-                          placeholder='Enter custom amount'
-                          value={customAmount}
-                          onChange={handleCustomAmountChange}
-                          className='pl-10'
-                          min={0}
-                        />
-                      </div>
+                {/* Donation Amount Selection */}
+                <div className='mb-6'>
+                  <Label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                    Donation Amount
+                  </Label>
+                  <div className='flex flex-wrap gap-3 mb-4'>
+                    {donationPresets.map((amount) => (
+                      <button
+                        key={amount}
+                        onClick={() => handleDonationAmountSelect(amount)}
+                        className={`
+                          px-4 py-2 rounded-full border transition-all
+                          ${
+                            donationAmount == amount
+                              ? "bg-indigo-600 text-white dark:bg-indigo-500"
+                              : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-gray-200 dark:border-gray-700"
+                          }
+                        `}
+                      >
+                        ${amount}
+                      </button>
+                    ))}
+                  </div>
+                  <div className='flex items-center'>
+                    <div className='relative flex-grow'>
+                      <DollarSignIcon
+                        className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400'
+                        size={20}
+                      />
+                      <Input
+                        type='number'
+                        placeholder='Enter custom amount'
+                        value={customAmount}
+                        onChange={handleCustomAmountChange}
+                        className='pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                        min={0}
+                      />
                     </div>
                   </div>
-
-                  {/* Personal Information */}
-                  <div className='space-y-4'>
-                    <div>
-                      <Label>Full Name</Label>
-                      <div className='relative'>
-                        <UserIcon
-                          className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
-                          size={20}
-                        />
-                        <Input
-                          placeholder='Your full name'
-                          className='pl-10'
-                          value={fullName}
-                          onChange={handleFullNameChange}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>Email Address</Label>
-                      <div className='relative'>
-                        <MailIcon
-                          className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500'
-                          size={20}
-                        />
-                        <Input
-                          type='email'
-                          placeholder='your.email@example.com'
-                          className='pl-10'
-                          value={email}
-                          onChange={handleEmailChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stripe Donation Button */}
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={!isFormValid() || isLoading}
-                    className='w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
-                  >
-                    {isLoading ? (
-                      "Processing..."
-                    ) : (
-                      <>
-                        <CreditCardIcon className='mr-2' /> Donate with Stripe
-                      </>
-                    )}
-                  </Button>
                 </div>
+
+                {/* Personal Information */}
+                <div className='space-y-4'>
+                  <div>
+                    <Label className='text-gray-700 dark:text-gray-200'>
+                      Full Name
+                    </Label>
+                    <div className='relative'>
+                      <UserIcon
+                        className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400'
+                        size={20}
+                      />
+                      <Input
+                        placeholder='Your full name'
+                        className='pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                        value={fullName}
+                        onChange={handleFullNameChange}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className='text-gray-700 dark:text-gray-200'>
+                      Email Address
+                    </Label>
+                    <div className='relative'>
+                      <MailIcon
+                        className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400'
+                        size={20}
+                      />
+                      <Input
+                        type='email'
+                        placeholder='your.email@example.com'
+                        className='pl-10 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                        value={email}
+                        onChange={handleEmailChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  onClick={handleSubmit}
+                  disabled={!isFormValid() || isLoading}
+                  className='w-full mt-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 dark:from-indigo-500 dark:to-purple-500 dark:hover:from-indigo-600 dark:hover:to-purple-600 text-white'
+                >
+                  {isLoading ? (
+                    "Processing..."
+                  ) : (
+                    <>
+                      <CreditCardIcon className='mr-2' /> Donate with Stripe
+                    </>
+                  )}
+                </Button>
               </>
             )}
           </div>
@@ -734,23 +743,27 @@ const DonatePage = () => {
               Campaign Highlights
             </h2>
             {isLoading ? (
-              <p>Loading Campaigns</p>
+              <p className='text-gray-600 dark:text-gray-400'>
+                Loading Campaigns...
+              </p>
             ) : error ? (
-              <p>{error}</p>
+              <p className='text-red-600 dark:text-red-400'>{error}</p>
             ) : (
               featuredCampaigns.map((campaign) => {
                 const Icon = categoryIcons[campaign.category] || HeartIcon;
                 return (
                   <Card
                     key={campaign._id}
-                    className='mb-6 hover:shadow-xl transition-all'
+                    className='mb-6 hover:shadow-xl transition-all dark:bg-gray-800'
                   >
                     <CardHeader className='flex flex-row items-center space-x-4'>
                       <Icon
                         className='text-indigo-600 dark:text-indigo-400'
                         size={36}
                       />
-                      <CardTitle>{campaign.title}</CardTitle>
+                      <CardTitle className='text-gray-900 dark:text-gray-100'>
+                        {campaign.title}
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className='text-gray-600 dark:text-gray-300 mb-4'>

@@ -243,24 +243,27 @@ const UpdateCampaign = () => {
   const SelectedIcon = categoryIcons[campaignData.category] || RocketIcon;
 
   return (
-    <Card className='max-w-2xl mx-auto bg-white dark:bg-gray-800'>
+    <Card className='max-w-2xl mx-auto bg-white dark:bg-gray-800 shadow-lg'>
       <CardHeader>
         <CardTitle className='flex items-center text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
           <SelectedIcon className='mr-3' size={32} />
           Update Campaign
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className='dark:text-gray-200'>
         {error && (
-          <div className='bg-red-50 border border-red-200 p-3 rounded-lg flex items-center mb-4'>
-            <AlertCircle className='mr-2 text-red-500' size={20} />
-            <span className='text-red-700'>{error}</span>
+          <div className='bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 p-3 rounded-lg flex items-center mb-4'>
+            <AlertCircle
+              className='mr-2 text-red-500 dark:text-red-400'
+              size={20}
+            />
+            <span className='text-red-700 dark:text-red-300'>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className='space-y-6'>
           <div>
-            <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+            <label className='block mb-2 text-gray-700 dark:text-gray-200'>
               Campaign Title
             </label>
             <Input
@@ -268,11 +271,12 @@ const UpdateCampaign = () => {
               onChange={(e) => handleInputChange("title", e.target.value)}
               required
               disabled={isLoading}
+              className='bg-white dark:bg-gray-900 dark:border-gray-700'
             />
           </div>
 
           <div>
-            <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+            <label className='block mb-2 text-gray-700 dark:text-gray-200'>
               Description
             </label>
             <Textarea
@@ -281,13 +285,17 @@ const UpdateCampaign = () => {
               rows={4}
               required
               disabled={isLoading}
+              className='bg-white dark:bg-gray-900 dark:border-gray-700'
             />
           </div>
 
           <div className='grid md:grid-cols-2 gap-4'>
             <div>
-              <label className='block mb-2 text-gray-700 dark:text-gray-300'>
-                <DollarSignIcon className='inline mr-2' size={16} />
+              <label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                <DollarSignIcon
+                  className='inline mr-2 dark:text-gray-300'
+                  size={16}
+                />
                 Fundraising Goal
               </label>
               <Input
@@ -299,12 +307,16 @@ const UpdateCampaign = () => {
                 required
                 disabled={isLoading}
                 min={100}
+                className='bg-white dark:bg-gray-900 dark:border-gray-700'
               />
             </div>
 
             <div>
-              <label className='block mb-2 text-gray-700 dark:text-gray-300'>
-                <CalendarIcon className='inline mr-2' size={16} />
+              <label className='block mb-2 text-gray-700 dark:text-gray-200'>
+                <CalendarIcon
+                  className='inline mr-2 dark:text-gray-300'
+                  size={16}
+                />
                 Campaign End Date
               </label>
               <Input
@@ -314,12 +326,13 @@ const UpdateCampaign = () => {
                 required
                 disabled={isLoading}
                 min={new Date().toISOString().split("T")[0]}
+                className='bg-white dark:bg-gray-900 dark:border-gray-700'
               />
             </div>
           </div>
 
           <div>
-            <label className='block mb-2 text-gray-700 dark:text-gray-300'>
+            <label className='block mb-2 text-gray-700 dark:text-gray-200'>
               Campaign Category
             </label>
             <Select
@@ -327,14 +340,18 @@ const UpdateCampaign = () => {
               onValueChange={(value) => handleInputChange("category", value)}
               disabled={isLoading}
             >
-              <SelectTrigger>
+              <SelectTrigger className='dark:bg-gray-900 dark:border-gray-700'>
                 <SelectValue placeholder='Select Campaign Category' />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='dark:bg-gray-800 dark:border-gray-700'>
                 {categories.map((category) => {
                   const Icon = categoryIcons[category] || RocketIcon;
                   return (
-                    <SelectItem key={category} value={category}>
+                    <SelectItem
+                      key={category}
+                      value={category}
+                      className='dark:text-gray-200'
+                    >
                       <div className='flex items-center'>
                         <Icon className='mr-2' size={16} />
                         {category}
@@ -347,8 +364,8 @@ const UpdateCampaign = () => {
           </div>
 
           <div>
-            <label className='block mb-2 text-gray-700 dark:text-gray-300'>
-              <ImageIcon className='inline mr-2' size={16} />
+            <label className='block mb-2 text-gray-700 dark:text-gray-200'>
+              <ImageIcon className='inline mr-2 dark:text-gray-300' size={16} />
               Campaign Image
             </label>
             <Input
@@ -356,14 +373,17 @@ const UpdateCampaign = () => {
               accept='image/*'
               onChange={handleImageChange}
               disabled={isLoading}
-              className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100'
+              className='file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold 
+                       file:bg-indigo-50 dark:file:bg-indigo-950 file:text-indigo-700 dark:file:text-indigo-300 
+                       hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900
+                       dark:bg-gray-900 dark:border-gray-700'
             />
             {previewUrl && (
               <div className='mt-4'>
                 <img
                   src={previewUrl}
                   alt='Campaign'
-                  className='w-full max-w-md rounded-lg shadow-md'
+                  className='w-full max-w-md rounded-lg shadow-md dark:shadow-gray-900'
                 />
               </div>
             )}
@@ -372,7 +392,7 @@ const UpdateCampaign = () => {
           <div className='flex gap-4'>
             <Button
               type='submit'
-              className='flex-1 bg-indigo-600 hover:bg-indigo-700'
+              className='flex-1 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600'
               disabled={isLoading}
             >
               {isLoading ? "Updating..." : "Update Campaign"}
@@ -383,7 +403,7 @@ const UpdateCampaign = () => {
               variant='destructive'
               onClick={() => setShowDeleteDialog(true)}
               disabled={isLoading}
-              className='bg-red-600 hover:bg-red-700'
+              className='bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600'
             >
               <Trash2Icon className='mr-2' size={16} />
               Delete
@@ -392,22 +412,23 @@ const UpdateCampaign = () => {
         </form>
 
         <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <AlertDialogContent
-            className='z-50 max-h-60 overflow-y-auto bg-white rounded-xl shadow-2xl
-                 border border-gray-100 ring-1 ring-black ring-opacity-5'
-          >
+          <AlertDialogContent className='bg-white dark:bg-gray-800 border dark:border-gray-700'>
             <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogTitle className='dark:text-gray-200'>
+                Are you sure?
+              </AlertDialogTitle>
+              <AlertDialogDescription className='dark:text-gray-400'>
                 This action cannot be undone. This will permanently delete your
                 campaign and remove all associated data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className='dark:bg-gray-700 dark:hover:bg-gray-600'>
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDelete}
-                className='bg-red-600 hover:bg-red-700'
+                className='bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600'
               >
                 Delete Campaign
               </AlertDialogAction>

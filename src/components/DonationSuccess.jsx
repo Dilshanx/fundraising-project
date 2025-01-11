@@ -184,7 +184,10 @@ const DonationSuccess = () => {
 
   const ShareModal = () => (
     <AlertDialog open={showShareModal} onOpenChange={setShowShareModal}>
-      <AlertDialogContent>
+      <AlertDialogContent
+        className='z-50  overflow-y-auto bg-white rounded-xl shadow-2xl
+                 border border-gray-100 ring-1 ring-black ring-opacity-5'
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Share Your Impact</AlertDialogTitle>
           <AlertDialogDescription>
