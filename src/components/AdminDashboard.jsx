@@ -33,10 +33,13 @@ import {
   ChevronRight,
   Trash2,
   Edit,
+  Ticket,
+  Users,
 } from "lucide-react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MyCampaigns from "@/components/MyCampaigns";
+import SupportTicketsView from "./SupportTicketsView";
 
 // Create axios instance with auth interceptor
 const apiConfig = axios.create({
@@ -58,7 +61,6 @@ apiConfig.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 || error.response?.status === 403) {
-      // Redirect to login if unauthorized
       window.location.href = "/login";
     }
     return Promise.reject(error);
@@ -67,6 +69,7 @@ apiConfig.interceptors.response.use(
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState("users");
   const [activeTab, setActiveTab] = useState("admin");
   const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,8 +113,10 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-  }, [activeTab, currentPage]);
+    if (activeSection === "users") {
+      fetchUsers();
+    }
+  }, [activeTab, currentPage, activeSection]);
 
   const handleDeleteUser = async (id) => {
     try {
@@ -187,136 +192,158 @@ const AdminDashboard = () => {
   return (
     <div className='container mx-auto p-6'>
       <MyCampaigns />
-      <Card>
-        <CardHeader>
-          <CardTitle className='text-2xl'>User Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4'>
-              {error}
+
+      {/* Main Navigation */}
+      <div className='flex space-x-4 mb-6'>
+        <Button
+          variant={activeSection === "users" ? "default" : "outline"}
+          onClick={() => setActiveSection("users")}
+        >
+          <Users className='w-4 h-4 mr-2' />
+          User Management
+        </Button>
+        <Button
+          variant={activeSection === "tickets" ? "default" : "outline"}
+          onClick={() => setActiveSection("tickets")}
+        >
+          <Ticket className='w-4 h-4 mr-2' />
+          Support Tickets
+        </Button>
+      </div>
+
+      {activeSection === "users" ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className='text-2xl'>User Management</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4'>
+                {error}
+              </div>
+            )}
+
+            {/* Tab Navigation */}
+            <div className='flex space-x-4 mb-6'>
+              <Button
+                variant={activeTab === "admin" ? "default" : "outline"}
+                onClick={() => {
+                  setActiveTab("admin");
+                  setCurrentPage(1);
+                }}
+              >
+                Admins
+              </Button>
+              <Button
+                variant={activeTab === "campaigner" ? "default" : "outline"}
+                onClick={() => {
+                  setActiveTab("campaigner");
+                  setCurrentPage(1);
+                }}
+              >
+                Campaigners
+              </Button>
+              <Button
+                variant={activeTab === "donor" ? "default" : "outline"}
+                onClick={() => {
+                  setActiveTab("donor");
+                  setCurrentPage(1);
+                }}
+              >
+                Donors
+              </Button>
             </div>
-          )}
 
-          {/* Rest of the component remains exactly the same */}
-          {/* Tab Navigation */}
-          <div className='flex space-x-4 mb-6'>
-            <Button
-              variant={activeTab === "admin" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("admin");
-                setCurrentPage(1);
-              }}
-            >
-              Admins
-            </Button>
-            <Button
-              variant={activeTab === "campaigner" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("campaigner");
-                setCurrentPage(1);
-              }}
-            >
-              Campaigners
-            </Button>
-            <Button
-              variant={activeTab === "donor" ? "default" : "outline"}
-              onClick={() => {
-                setActiveTab("donor");
-                setCurrentPage(1);
-              }}
-            >
-              Donors
-            </Button>
-          </div>
-
-          {/* User Table */}
-          <div className='rounded-md border'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell className='font-medium'>
-                      <div className='flex items-center space-x-2'>
-                        <UserCircle className='w-6 h-6' />
-                        <span>{user.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell className='capitalize'>{user.role}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          user.isVerified
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {user.isVerified ? "Verified" : "Pending"}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <div className='flex space-x-2'>
-                        <Button
-                          variant='outline'
-                          size='sm'
-                          onClick={() => handleEditClick(user)}
-                        >
-                          <Edit className='w-4 h-4' />
-                        </Button>
-                        <Button
-                          variant='destructive'
-                          size='sm'
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className='w-4 h-4' />
-                        </Button>
-                      </div>
-                    </TableCell>
+            {/* User Table */}
+            <div className='rounded-md border'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user._id}>
+                      <TableCell className='font-medium'>
+                        <div className='flex items-center space-x-2'>
+                          <UserCircle className='w-6 h-6' />
+                          <span>{user.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell className='capitalize'>{user.role}</TableCell>
+                      <TableCell>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            user.isVerified
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {user.isVerified ? "Verified" : "Pending"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className='flex space-x-2'>
+                          <Button
+                            variant='outline'
+                            size='sm'
+                            onClick={() => handleEditClick(user)}
+                          >
+                            <Edit className='w-4 h-4' />
+                          </Button>
+                          <Button
+                            variant='destructive'
+                            size='sm'
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className='w-4 h-4' />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
-          {/* Pagination */}
-          <div className='flex items-center justify-between mt-4'>
-            <Button
-              variant='outline'
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className='w-4 h-4 mr-2' />
-              Previous
-            </Button>
-            <span>
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant='outline'
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className='w-4 h-4 ml-2' />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            {/* Pagination */}
+            <div className='flex items-center justify-between mt-4'>
+              <Button
+                variant='outline'
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className='w-4 h-4 mr-2' />
+                Previous
+              </Button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant='outline'
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+                <ChevronRight className='w-4 h-4 ml-2' />
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <SupportTicketsView />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog
@@ -349,7 +376,7 @@ const AdminDashboard = () => {
       {/* Edit User Dialog */}
       <AlertDialog open={isEditMode} onOpenChange={setIsEditMode}>
         <AlertDialogContent
-          className='z-50  overflow-y-auto bg-white rounded-xl shadow-2xl
+          className='z-50 overflow-y-auto bg-white rounded-xl shadow-2xl
                  border border-gray-100 ring-1 ring-black ring-opacity-5'
         >
           <AlertDialogHeader>
